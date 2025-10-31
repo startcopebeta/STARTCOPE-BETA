@@ -35,13 +35,25 @@
                 <div class="bot-message">
                     <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
                     <div class="message-bubble">
-                        Hello! I'm Star Agent AI powered by Claude. How can I help you explore the world today?
+                        <strong>👋 Hello! I'm Star Agent AI</strong><br><br>
+                        I can help you with:<br>
+                        💬 Chat and answer questions<br>
+                        🎨 Generate images with <code>/poli [description]</code><br>
+                        🗺️ Explore world maps and countries<br><br>
+                        How can I assist you today?
                     </div>
                 </div>
             </div>
             <div class="chatbot-input-area">
-                <input type="text" id="chatbotInput" placeholder="Ask me anything..." class="chatbot-input">
-                <button id="sendMessage" class="send-btn">Send</button>
+                <div class="input-wrapper">
+                    <button class="attach-btn" title="Generate Image">🎨</button>
+                    <input type="text" id="chatbotInput" placeholder="Type a message or /poli [description] to generate image..." class="chatbot-input">
+                    <button id="sendMessage" class="send-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

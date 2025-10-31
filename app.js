@@ -559,7 +559,10 @@ async function sendChatMessage() {
     
     const userMessage = document.createElement('div');
     userMessage.className = 'user-message';
-    userMessage.innerHTML = `<div class="message-bubble">${escapeHtml(message)}</div>`;
+    userMessage.innerHTML = `
+        <div class="message-avatar-user">👤</div>
+        <div class="message-bubble">${escapeHtml(message)}</div>
+    `;
     messagesContainer.appendChild(userMessage);
     
     input.value = '';
@@ -569,10 +572,21 @@ async function sendChatMessage() {
     loadingMessage.id = 'loading-message';
     loadingMessage.innerHTML = `
         <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
-        <div class="message-bubble">Thinking...</div>
+        <div class="message-bubble typing-indicator">
+            <span></span><span></span><span></span>
+        </div>
     `;
     messagesContainer.appendChild(loadingMessage);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Check if message is an image generation request
+    const imageCommands = ['/poli', '/generate', '/image', '/img'];
+    const isImageRequest = imageCommands.some(cmd => message.toLowerCase().startsWith(cmd));
+    
+    if (isImageRequest) {
+        await generateImage(message, messagesContainer);
+        return;
+    }
     
     try {
         const response = await fetch(`${CLAUDE_API_URL}?prompt=${encodeURIComponent(message)}&uid=${USER_ID}`);
@@ -602,6 +616,80 @@ async function sendChatMessage() {
         messagesContainer.appendChild(errorMessage);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+}
+
+async function generateImage(message, messagesContainer) {
+    const loadingEl = document.getElementById('loading-message');
+    
+    // Extract prompt from command
+    const prompt = message.replace(/^\/(?:poli|generate|image|img)\s*/i, '').trim();
+    
+    if (!prompt) {
+        if (loadingEl) loadingEl.remove();
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'bot-message';
+        errorMessage.innerHTML = `
+            <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+            <div class="message-bubble">Please provide a description for the image you want to generate.<br><br>Example: <code>/poli a beautiful sunset over mountains</code></div>
+        `;
+        messagesContainer.appendChild(errorMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return;
+    }
+    
+    try {
+        // Update loading message
+        if (loadingEl) {
+            loadingEl.innerHTML = `
+                <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+                <div class="message-bubble">🎨 Generating image: "${prompt}"...</div>
+            `;
+        }
+        
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
+        
+        // Wait a bit for the image to be generated
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        if (loadingEl) loadingEl.remove();
+        
+        const botMessage = document.createElement('div');
+        botMessage.className = 'bot-message';
+        botMessage.innerHTML = `
+            <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+            <div class="message-bubble image-message">
+                <div class="image-caption">✨ Generated Image</div>
+                <img src="${imageUrl}" alt="Generated: ${escapeHtml(prompt)}" class="generated-image" loading="lazy">
+                <div class="image-actions">
+                    <button class="image-action-btn" onclick="downloadImage('${imageUrl}', '${escapeHtml(prompt)}')">⬇️ Download</button>
+                    <button class="image-action-btn" onclick="window.open('${imageUrl}', '_blank')">🔍 View Full</button>
+                </div>
+            </div>
+        `;
+        messagesContainer.appendChild(botMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+    } catch (error) {
+        if (loadingEl) loadingEl.remove();
+        
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'bot-message';
+        errorMessage.innerHTML = `
+            <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+            <div class="message-bubble">❌ Failed to generate image. Please try again.</div>
+        `;
+        messagesContainer.appendChild(errorMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+}
+
+function downloadImage(url, prompt) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${prompt.substring(0, 30).replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function escapeHtml(text) {
