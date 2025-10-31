@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARCOPE MAPS</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="STARCOPE MAPS Logo" class="logo">
+            <h1>STARCOPE MAPS</h1>
+        </header>
+        
+        <div class="controls">
+            <select id="countrySelect">
+                <option value="">Select a Country</option>
+                <option value="philippines">Philippines</option>
+                <option value="japan">Japan</option>
+                <option value="usa">United States</option>
+                <option value="uk">United Kingdom</option>
+                <option value="france">France</option>
+                <option value="germany">Germany</option>
+                <option value="italy">Italy</option>
+                <option value="spain">Spain</option>
+                <option value="canada">Canada</option>
+                <option value="australia">Australia</option>
+                <option value="brazil">Brazil</option>
+                <option value="india">India</option>
+                <option value="china">China</option>
+                <option value="south-korea">South Korea</option>
+                <option value="mexico">Mexico</option>
+            </select>
+            
+            <div class="stats">
+                <span>Total Views: <strong id="totalViews">0</strong></span>
+                <span>Countries Explored: <strong id="countriesExplored">0</strong></span>
+            </div>
+        </div>
+        
+        <div id="map"></div>
+        
+        <div class="info-panel">
+            <h3 id="countryName">Select a country to view</h3>
+            <p id="countryInfo">Choose a country from the dropdown menu to explore its map.</p>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
