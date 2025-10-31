@@ -458,6 +458,10 @@ function setupEventListeners() {
         
         alert('📱 STAR MOBILE APK download started!\n\nNote: Make sure to enable "Install from Unknown Sources" in your Android settings before installing.');
     });
+
+    document.getElementById('dashboardBtn').addEventListener('click', () => {
+        window.location.href = 'dashboard.html';
+    });
 }
 
 function initMap() {
