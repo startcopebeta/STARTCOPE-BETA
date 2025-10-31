@@ -15,65 +15,171 @@
             <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="STARCOPE MAPS Logo" class="welcome-logo">
             <h1 class="welcome-title">STARCOPE MAPS</h1>
             <p class="welcome-subtitle">Explore the World, One Country at a Time</p>
+            <p class="beta-tag">BETA - OFFICIAL WEBSITE</p>
             <button id="getStartedBtn" class="get-started-btn">GET STARTED</button>
-            <button id="adminBtn" class="admin-btn">ADMIN</button>
         </div>
     </div>
 
-    <!-- Maintenance Screen -->
-    <div id="maintenanceScreen" class="maintenance-screen" style="display: none;">
-        <div class="maintenance-content">
-            <div class="maintenance-icon">🔧</div>
-            <h1>Under Maintenance</h1>
-            <p>We're currently improving our service. Please check back soon!</p>
-            <p class="maintenance-subtitle">The developer is working on something awesome.</p>
+    <!-- AI Chatbot Modal -->
+    <div id="chatbotModal" class="chatbot-modal" style="display: none;">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="Star Agent AI" class="chatbot-avatar">
+                <div class="chatbot-title">
+                    <h3>STAR AGENT AI</h3>
+                    <span class="chatbot-status">Online</span>
+                </div>
+                <button id="closeChatbot" class="close-chatbot">✕</button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="bot-message">
+                    <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+                    <div class="message-bubble">
+                        Hello! I'm Star Agent AI. How can I help you explore the world today?
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbotInput" placeholder="Ask me anything about maps..." class="chatbot-input">
+                <button id="sendMessage" class="send-btn">Send</button>
+            </div>
         </div>
     </div>
 
-    <!-- Down Screen -->
-    <div id="downScreen" class="down-screen" style="display: none;">
-        <div class="down-content">
-            <div class="down-icon">⚠️</div>
-            <h1>Service Temporarily Down</h1>
-            <p>We're experiencing technical difficulties. Please try again later.</p>
-            <p class="down-subtitle">Our team is working to restore the service.</p>
-        </div>
-    </div>
-
-    <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="admin-dashboard" style="display: none;">
-        <div class="admin-content">
-            <h2>ADMIN DASHBOARD</h2>
-            <button id="closeAdminBtn" class="close-admin-btn">✕ Close</button>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal" style="display: none;">
+        <div class="settings-container">
+            <h2>Settings</h2>
+            <button id="closeSettings" class="close-modal">✕</button>
             
-            <div class="admin-controls">
-                <div class="admin-control-item">
-                    <label class="switch">
-                        <input type="checkbox" id="maintenanceToggle">
-                        <span class="slider"></span>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <span>Dark Theme</span>
+                        <label class="switch">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="slider"></span>
+                        </label>
                     </label>
-                    <span class="control-label">Maintenance Mode</span>
                 </div>
                 
-                <div class="admin-control-item">
-                    <label class="switch">
-                        <input type="checkbox" id="downToggle">
-                        <span class="slider"></span>
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <span>Auto-center Map</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoCenterToggle" checked>
+                            <span class="slider"></span>
+                        </label>
                     </label>
-                    <span class="control-label">Down Mode</span>
+                </div>
+                
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <span>Show Markers</span>
+                        <label class="switch">
+                            <input type="checkbox" id="showMarkersToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="mapStyle">Map Style:</label>
+                    <select id="mapStyle" class="style-select">
+                        <option value="default">Default</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="terrain">Terrain</option>
+                    </select>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Login Modal -->
-    <div id="adminLogin" class="admin-login" style="display: none;">
-        <div class="admin-login-content">
-            <h3>Admin Login</h3>
-            <input type="password" id="adminPassword" placeholder="Enter Password" class="admin-password-input">
-            <button id="loginBtn" class="login-btn">LOGIN</button>
-            <button id="cancelLoginBtn" class="cancel-btn">CANCEL</button>
-            <p id="loginError" class="login-error" style="display: none;">Invalid password!</p>
+    <!-- About Modal -->
+    <div id="aboutModal" class="about-modal" style="display: none;">
+        <div class="about-container">
+            <h2>About STARCOPE MAPS</h2>
+            <button id="closeAbout" class="close-modal">✕</button>
+            
+            <div class="about-content">
+                <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="Logo" class="about-logo">
+                <h3>STARCOPE MAPS BETA</h3>
+                <p class="about-version">Version 1.0.0 BETA</p>
+                
+                <div class="about-section">
+                    <h4>Official Website</h4>
+                    <p>This is the official STARCOPE MAPS website - your gateway to exploring the world through interactive maps.</p>
+                </div>
+                
+                <div class="about-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>🗺️ Interactive world maps</li>
+                        <li>🌍 15+ countries to explore</li>
+                        <li>🤖 AI-powered chatbot assistant</li>
+                        <li>🎨 Customizable themes</li>
+                        <li>📊 Track your exploration progress</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h4>About This Project</h4>
+                    <p>STARCOPE MAPS combines cutting-edge mapping technology with AI assistance to provide the best exploration experience.</p>
+                </div>
+                
+                <p class="about-footer">© 2024 STARCOPE MAPS. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="profile-modal" style="display: none;">
+        <div class="profile-container">
+            <h2>User Profile</h2>
+            <button id="closeProfile" class="close-modal">✕</button>
+            
+            <div class="profile-content">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar">👤</div>
+                    <h3 id="profileName">Explorer</h3>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="profileViews">0</span>
+                            <span class="stat-label">Total Views</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🌍</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="profileCountries">0</span>
+                            <span class="stat-label">Countries Explored</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="profileLevel">1</span>
+                            <span class="stat-label">Explorer Level</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-badges">
+                    <h4>Achievements</h4>
+                    <div class="badges-grid" id="badgesGrid">
+                        <div class="badge locked">🏆</div>
+                        <div class="badge locked">🎯</div>
+                        <div class="badge locked">🌟</div>
+                        <div class="badge locked">💎</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -82,6 +188,11 @@
         <header>
             <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="STARCOPE MAPS Logo" class="logo">
             <h1>STARCOPE MAPS</h1>
+            <div class="header-buttons">
+                <button id="profileBtn" class="header-btn" title="Profile">👤</button>
+                <button id="settingsBtn" class="header-btn" title="Settings">⚙️</button>
+                <button id="aboutBtn" class="header-btn" title="About">ℹ️</button>
+            </div>
         </header>
         
         <div class="controls">
@@ -113,8 +224,28 @@
         <div id="map"></div>
         
         <div class="info-panel">
-            <h3 id="countryName">Select a country to view</h3>
+            <div class="info-header">
+                <h3 id="countryName">Select a country to view</h3>
+                <button id="chatbotBtn" class="chatbot-btn">
+                    <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="chatbot-btn-icon">
+                    <span>STAR AGENT AI</span>
+                </button>
+            </div>
             <p id="countryInfo">Choose a country from the dropdown menu to explore its map.</p>
+            <div class="info-extras">
+                <div class="info-card">
+                    <span class="info-icon">📍</span>
+                    <span id="countryCapital">-</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">👥</span>
+                    <span id="countryPopulation">-</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">🗣️</span>
+                    <span id="countryLanguage">-</span>
+                </div>
+            </div>
         </div>
     </div>
     
