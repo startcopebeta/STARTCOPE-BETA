@@ -96,17 +96,155 @@ let map;
 let totalViews = 0;
 let countriesExplored = new Set();
 
+// Admin password
+const ADMIN_PASSWORD = '1989';
+
+// Initialize app on load
+window.addEventListener('load', () => {
+    checkAppStatus();
+    setupEventListeners();
+});
+
+function checkAppStatus() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.maintenance) {
+                showMaintenanceScreen();
+            } else if (data.down) {
+                showDownScreen();
+            } else {
+                // Show welcome screen by default
+                document.getElementById('welcomeScreen').style.display = 'flex';
+            }
+        })
+        .catch(err => {
+            console.log('Failed to check status:', err);
+            document.getElementById('welcomeScreen').style.display = 'flex';
+        });
+}
+
+function setupEventListeners() {
+    // Get Started Button
+    document.getElementById('getStartedBtn').addEventListener('click', () => {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        initMap();
+        loadStats();
+    });
+
+    // Admin Button
+    document.getElementById('adminBtn').addEventListener('click', () => {
+        document.getElementById('adminLogin').style.display = 'flex';
+    });
+
+    // Login Button
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const password = document.getElementById('adminPassword').value;
+        if (password === ADMIN_PASSWORD) {
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            loadAdminSettings();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    });
+
+    // Cancel Login
+    document.getElementById('cancelLoginBtn').addEventListener('click', () => {
+        document.getElementById('adminLogin').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('loginError').style.display = 'none';
+    });
+
+    // Close Admin Dashboard
+    document.getElementById('closeAdminBtn').addEventListener('click', () => {
+        document.getElementById('adminDashboard').style.display = 'none';
+    });
+
+    // Maintenance Toggle
+    document.getElementById('maintenanceToggle').addEventListener('change', (e) => {
+        updateAppStatus('maintenance', e.target.checked);
+    });
+
+    // Down Toggle
+    document.getElementById('downToggle').addEventListener('change', (e) => {
+        updateAppStatus('down', e.target.checked);
+    });
+
+    // Country Select
+    document.getElementById('countrySelect').addEventListener('change', (e) => {
+        updateMap(e.target.value);
+    });
+}
+
+function loadAdminSettings() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('maintenanceToggle').checked = data.maintenance || false;
+            document.getElementById('downToggle').checked = data.down || false;
+        })
+        .catch(err => console.log('Failed to load admin settings:', err));
+}
+
+function updateAppStatus(type, value) {
+    fetch('/api/status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ [type]: value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.maintenance) {
+                showMaintenanceScreen();
+            } else if (data.down) {
+                showDownScreen();
+            } else {
+                hideStatusScreens();
+            }
+        }
+    })
+    .catch(err => console.log('Failed to update status:', err));
+}
+
+function showMaintenanceScreen() {
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('downScreen').style.display = 'none';
+    document.getElementById('maintenanceScreen').style.display = 'flex';
+    document.getElementById('adminDashboard').style.display = 'none';
+}
+
+function showDownScreen() {
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('maintenanceScreen').style.display = 'none';
+    document.getElementById('downScreen').style.display = 'flex';
+    document.getElementById('adminDashboard').style.display = 'none';
+}
+
+function hideStatusScreens() {
+    document.getElementById('maintenanceScreen').style.display = 'none';
+    document.getElementById('downScreen').style.display = 'none';
+}
+
 function initMap() {
-    map = L.map('map').setView([20, 0], 2);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 18
-    }).addTo(map);
+    if (!map) {
+        map = L.map('map').setView([20, 0], 2);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+    }
 }
 
 function updateMap(countryKey) {
-    if (!countryKey) return;
+    if (!countryKey || !map) return;
     
     const country = countries[countryKey];
     if (!country) return;
@@ -157,12 +295,3 @@ function loadStats() {
         })
         .catch(err => console.log('Failed to load stats:', err));
 }
-
-document.getElementById('countrySelect').addEventListener('change', (e) => {
-    updateMap(e.target.value);
-});
-
-window.addEventListener('load', () => {
-    initMap();
-    loadStats();
-});

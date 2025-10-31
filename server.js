@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(express.static('.'));
 
 const STATS_FILE = 'stats.json';
+const STATUS_FILE = 'status.json';
 
 function readStats() {
     try {
@@ -31,6 +32,26 @@ function writeStats(stats) {
     }
 }
 
+function readStatus() {
+    try {
+        if (fs.existsSync(STATUS_FILE)) {
+            const data = fs.readFileSync(STATUS_FILE, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (err) {
+        console.error('Error reading status:', err);
+    }
+    return { maintenance: false, down: false };
+}
+
+function writeStatus(status) {
+    try {
+        fs.writeFileSync(STATUS_FILE, JSON.stringify(status, null, 2));
+    } catch (err) {
+        console.error('Error writing status:', err);
+    }
+}
+
 app.get('/api/stats', (req, res) => {
     const stats = readStats();
     res.json(stats);
@@ -42,7 +63,19 @@ app.post('/api/stats', (req, res) => {
     res.json({ success: true });
 });
 
-app.get('*', (req, res) => {
+app.get('/api/status', (req, res) => {
+    const status = readStatus();
+    res.json(status);
+});
+
+app.post('/api/status', (req, res) => {
+    const currentStatus = readStatus();
+    const newStatus = { ...currentStatus, ...req.body };
+    writeStatus(newStatus);
+    res.json({ success: true, ...newStatus });
+});
+
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
