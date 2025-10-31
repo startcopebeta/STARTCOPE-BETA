@@ -137,6 +137,147 @@
             font-size: 4em;
             margin-bottom: 20px;
         }
+        
+        .auth-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .auth-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .auth-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .auth-btn.register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: white;
+        }
+        
+        .get-started-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            color: #000;
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .get-started-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-modal.active {
+            display: flex;
+        }
+        
+        .login-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            color: white;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .login-content h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .oauth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .oauth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .oauth-btn.google {
+            background: white;
+            color: #333;
+        }
+        
+        .oauth-btn.google:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .oauth-btn.github {
+            background: #24292e;
+            color: white;
+        }
+        
+        .oauth-btn.github:hover {
+            background: #1a1e22;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -154,6 +295,7 @@
                 Navigate through constellations, discover celestial objects, and explore the wonders 
                 of our universe with cutting-edge technology.
             </p>
+            <button class="get-started-btn" onclick="openLoginModal()">GET STARTED</button>
         </div>
         
         <div class="features">
@@ -203,7 +345,125 @@
     
     <a href="/admin-login.html" class="admin-link">🔐 Admin Access</a>
     
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+            <h2>🌟 Join STARCOPE MAPS</h2>
+            <p style="text-align: center; margin-bottom: 30px; opacity: 0.9;">Create your account to start saving</p>
+            <form id="registerForm" onsubmit="handleRegister(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="text" id="username" placeholder="Username" required 
+                    style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                <input type="password" id="password" placeholder="Password" required minlength="4"
+                    style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                <input type="tel" id="phoneNumber" placeholder="Phone Number (09xxxxxxxxx)" required 
+                    pattern="09[0-9]{9}" style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                <input type="text" id="firstName" placeholder="First Name (Optional)" 
+                    style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                <input type="text" id="lastName" placeholder="Last Name (Optional)" 
+                    style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                <button type="submit" class="oauth-btn google" style="margin-top: 10px;">
+                    🚀 Create Account & Start Saving
+                </button>
+            </form>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                Already have an account? <a href="#" onclick="showLoginForm(); return false;" style="color: #ffd700; text-decoration: underline;">Login here</a>
+            </p>
+        </div>
+    </div>
+    
     <script>
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+        
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+        
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, phoneNumber, firstName, lastName })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Account created successfully! Welcome to STARCOPE MAPS 🌟');
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration failed. Please try again.');
+            }
+        }
+        
+        function showLoginForm() {
+            const loginContent = document.querySelector('.login-content');
+            loginContent.innerHTML = `
+                <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+                <h2>🌟 Welcome Back!</h2>
+                <p style="text-align: center; margin-bottom: 30px; opacity: 0.9;">Login to access your STAR SAVINGS</p>
+                <form onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="text" id="loginUsername" placeholder="Username" required 
+                        style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                    <input type="password" id="loginPassword" placeholder="Password" required 
+                        style="padding: 15px; border-radius: 10px; border: none; font-size: 1.1em;">
+                    <button type="submit" class="oauth-btn google" style="margin-top: 10px;">
+                        🔐 Login
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                    Don't have an account? <a href="#" onclick="location.reload()" style="color: #ffd700; text-decoration: underline;">Register here</a>
+                </p>
+            `;
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Login successful! Welcome back 🌟');
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+            }
+        }
+        
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLoginModal();
+            }
+        });
+        
         async function trackView() {
             try {
                 const response = await fetch('/api/track-view', {
