@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARCOPE MAPS - Explore the Universe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .header .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .hero h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.3em;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        
+        .feature-card p {
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        
+        .stats {
+            text-align: center;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+        
+        .stats h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .stats .counter {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            transition: background 0.3s ease;
+        }
+        
+        .admin-link:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .stars {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⭐ STARCOPE MAPS ⭐</h1>
+        <p class="tagline">Your Gateway to the Stars</p>
+    </div>
+    
+    <div class="container">
+        <div class="hero">
+            <div class="stars">🌟 🌠 ✨</div>
+            <h2>Explore the Universe Like Never Before</h2>
+            <p>
+                STARCOPE MAPS brings you the most comprehensive interactive star mapping experience. 
+                Navigate through constellations, discover celestial objects, and explore the wonders 
+                of our universe with cutting-edge technology.
+            </p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>🔭 Real-Time Star Tracking</h3>
+                <p>Track stars, planets, and constellations in real-time. Our advanced mapping system 
+                updates continuously to show you the exact positions of celestial bodies.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🌌 3D Universe View</h3>
+                <p>Experience the cosmos in stunning 3D. Rotate, zoom, and explore the universe from 
+                any angle with our immersive visualization technology.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📚 Comprehensive Database</h3>
+                <p>Access detailed information about millions of stars, galaxies, and deep space objects. 
+                Learn about their properties, history, and significance.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🎯 Custom Star Maps</h3>
+                <p>Create personalized star maps for any date, time, and location. Perfect for special 
+                occasions or astronomical events.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📱 Mobile Friendly</h3>
+                <p>Access STARCOPE MAPS from anywhere. Our responsive design works perfectly on all 
+                devices, from smartphones to desktops.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🚀 Space Missions</h3>
+                <p>Stay updated with current and upcoming space missions. Follow satellites, space stations, 
+                and interplanetary probes in real-time.</p>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <h3>Total Visitors</h3>
+            <div class="counter" id="view-counter">Loading...</div>
+            <p style="margin-top: 15px; opacity: 0.8;">Thank you for exploring the universe with us!</p>
+        </div>
+    </div>
+    
+    <a href="/admin-login.html" class="admin-link">🔐 Admin Access</a>
+    
+    <script>
+        async function trackView() {
+            try {
+                const response = await fetch('/api/track-view', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                document.getElementById('view-counter').textContent = data.totalViews;
+            } catch (error) {
+                console.error('Failed to track view:', error);
+                updateStats();
+            }
+        }
+        
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                document.getElementById('view-counter').textContent = data.views;
+            } catch (error) {
+                console.error('Failed to update stats:', error);
+            }
+        }
+        
+        trackView();
+        setInterval(updateStats, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "starcope-maps",
+  "version": "1.0.0",
+  "description": "STARCOPE MAPS - Star Mapping Application with Admin Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "starcope",
+    "maps",
+    "stars"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
