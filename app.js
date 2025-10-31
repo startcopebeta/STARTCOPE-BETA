@@ -1,6 +1,7 @@
 
 const CLAUDE_API_URL = 'https://daikyu-apizer-108.up.railway.app/api/claude-ai';
 const USER_ID = '61580959514473';
+const PHIVOLCS_API_URL = 'https://betadash-api-swordslush-production.up.railway.app/phivolcs';
 
 let earthquakeData = [];
 let showEarthquakes = false;
@@ -8,6 +9,9 @@ let earthquakeMarkers = [];
 let weatherData = null;
 let showWeather = false;
 let showTraffic = false;
+let phivolcsData = null;
+let showPhivolcs = false;
+let phivolcsMarkers = [];
 
 const countries = {
     'philippines': {
@@ -344,6 +348,7 @@ function setupEventListeners() {
         initMap();
         loadStats();
         loadEarthquakeData();
+        loadPhivolcsData();
     });
 
     document.getElementById('countrySelect').addEventListener('change', (e) => {
@@ -433,6 +438,12 @@ function setupEventListeners() {
             mapStyle = 'satellite';
             updateMapStyle();
         }
+        saveSettings();
+    });
+
+    document.getElementById('phivolcsToggle').addEventListener('change', (e) => {
+        showPhivolcs = e.target.checked;
+        togglePhivolcs();
         saveSettings();
     });
 }
@@ -634,6 +645,84 @@ function clearEarthquakes() {
     earthquakeMarkers = [];
 }
 
+async function loadPhivolcsData() {
+    try {
+        const response = await fetch(`${PHIVOLCS_API_URL}?info=Philippines`);
+        const data = await response.json();
+        phivolcsData = data;
+        if (showPhivolcs) {
+            displayPhivolcs();
+        }
+    } catch (error) {
+        console.log('Could not load PHIVOLCS data');
+    }
+}
+
+function togglePhivolcs() {
+    if (showPhivolcs) {
+        displayPhivolcs();
+    } else {
+        clearPhivolcs();
+    }
+}
+
+function displayPhivolcs() {
+    if (!map || !phivolcsData) return;
+    clearPhivolcs();
+    
+    if (phivolcsData.volcanoes && Array.isArray(phivolcsData.volcanoes)) {
+        phivolcsData.volcanoes.forEach(volcano => {
+            if (volcano.latitude && volcano.longitude) {
+                const marker = L.marker([volcano.latitude, volcano.longitude], {
+                    icon: L.divIcon({
+                        className: 'volcano-marker',
+                        html: '🌋',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <b>🌋 ${volcano.name || 'Volcano'}</b><br>
+                    Alert Level: ${volcano.alert_level || 'N/A'}<br>
+                    Status: ${volcano.status || 'N/A'}<br>
+                    Location: ${volcano.location || 'N/A'}
+                `);
+                phivolcsMarkers.push(marker);
+            }
+        });
+    }
+    
+    if (phivolcsData.earthquakes && Array.isArray(phivolcsData.earthquakes)) {
+        phivolcsData.earthquakes.forEach(quake => {
+            if (quake.latitude && quake.longitude) {
+                const mag = parseFloat(quake.magnitude) || 0;
+                const marker = L.circleMarker([quake.latitude, quake.longitude], {
+                    radius: mag * 4,
+                    fillColor: '#ff6b6b',
+                    color: '#c92a2a',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <b>📍 Earthquake</b><br>
+                    Magnitude: ${quake.magnitude || 'N/A'}<br>
+                    Depth: ${quake.depth || 'N/A'}<br>
+                    Location: ${quake.location || 'N/A'}<br>
+                    Time: ${quake.time || 'N/A'}
+                `);
+                phivolcsMarkers.push(marker);
+            }
+        });
+    }
+}
+
+function clearPhivolcs() {
+    phivolcsMarkers.forEach(marker => map.removeLayer(marker));
+    phivolcsMarkers = [];
+}
+
 function filterCountries(searchTerm) {
     const select = document.getElementById('countrySelect');
     const options = select.querySelectorAll('option');
@@ -683,7 +772,8 @@ function saveSettings() {
         autoCenter: document.getElementById('autoCenterToggle').checked,
         showEarthquakes: showEarthquakes,
         showWeather: showWeather,
-        showTraffic: showTraffic
+        showTraffic: showTraffic,
+        showPhivolcs: showPhivolcs
     };
     localStorage.setItem('starcopeSettings', JSON.stringify(settings));
 }
@@ -698,6 +788,7 @@ function loadSettings() {
         showEarthquakes = settings.showEarthquakes || false;
         showWeather = settings.showWeather || false;
         showTraffic = settings.showTraffic || false;
+        showPhivolcs = settings.showPhivolcs || false;
         
         document.getElementById('themeToggle').checked = isDarkTheme;
         document.getElementById('mapStyle').value = mapStyle;
@@ -706,6 +797,7 @@ function loadSettings() {
         document.getElementById('earthquakeToggle').checked = showEarthquakes;
         document.getElementById('weatherToggle').checked = showWeather;
         document.getElementById('trafficToggle').checked = showTraffic;
+        document.getElementById('phivolcsToggle').checked = showPhivolcs;
         
         applyTheme();
     }
