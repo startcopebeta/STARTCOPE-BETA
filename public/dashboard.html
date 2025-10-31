@@ -292,13 +292,17 @@
                     document.getElementById('userPhone').textContent = `Phone: ${user.phoneNumber}`;
                     document.getElementById('balance').textContent = `₱${parseFloat(user.balance).toFixed(2)}`;
                 } else {
-                    alert('Please login first');
-                    window.location.href = '/';
+                    document.getElementById('userFullName').textContent = 'Guest User';
+                    document.getElementById('userUsername').textContent = '@guest';
+                    document.getElementById('userPhone').textContent = 'Phone: Not available';
+                    document.getElementById('balance').textContent = '₱0.00';
                 }
             } catch (error) {
                 console.error('Profile error:', error);
-                alert('Please login first');
-                window.location.href = '/';
+                document.getElementById('userFullName').textContent = 'Guest User';
+                document.getElementById('userUsername').textContent = '@guest';
+                document.getElementById('userPhone').textContent = 'Phone: Not available';
+                document.getElementById('balance').textContent = '₱0.00';
             }
         }
         
