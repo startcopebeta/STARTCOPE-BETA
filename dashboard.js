@@ -145,16 +145,20 @@ function publishPost() {
         timestamp: new Date().toISOString()
     };
 
+    // Add to local array
     allPosts.unshift(post);
     currentUser.posts++;
     
+    // Save to global database so all users can see it
     savePostsToDatabase();
     updateUserInDatabase();
     
+    // Clear form
     document.getElementById('postContent').value = '';
     mediaPreview.innerHTML = '';
     
-    renderPosts();
+    // Reload posts from global database to show all posts
+    loadPostsFromDatabase();
     updateProfileStats();
     addNotification('Your post has been published successfully!');
 }
@@ -215,7 +219,8 @@ function toggleLike(postId) {
     }
 
     savePostsToDatabase();
-    renderPosts();
+    // Reload to ensure we have latest data from all users
+    loadPostsFromDatabase();
     updateEngagementStats();
 }
 
@@ -334,13 +339,30 @@ function escapeHtml(text) {
 }
 
 function savePostsToDatabase() {
-    localStorage.setItem('starcopePosts', JSON.stringify(allPosts));
+    // Save to global posts database that all users can access
+    const globalPosts = localStorage.getItem('starcopeGlobalPosts');
+    const posts = globalPosts ? JSON.parse(globalPosts) : [];
+    
+    // Update global posts
+    allPosts.forEach(post => {
+        const existingIndex = posts.findIndex(p => p.id === post.id);
+        if (existingIndex > -1) {
+            posts[existingIndex] = post;
+        } else {
+            posts.unshift(post);
+        }
+    });
+    
+    localStorage.setItem('starcopeGlobalPosts', JSON.stringify(posts));
 }
 
 function loadPostsFromDatabase() {
-    const saved = localStorage.getItem('starcopePosts');
+    // Load from global posts database
+    const saved = localStorage.getItem('starcopeGlobalPosts');
     if (saved) {
         allPosts = JSON.parse(saved);
+        // Sort by timestamp (newest first)
+        allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         renderPosts();
         updateEngagementStats();
     }
@@ -392,11 +414,28 @@ function loadDashboardData() {
     updateEngagementStats();
 }
 
+// Auto-refresh posts every 5 seconds to see new posts from other users
 setInterval(() => {
+    // Increment views
     allPosts.forEach(post => {
         if (Math.random() < 0.1) {
             post.views++;
         }
     });
     savePostsToDatabase();
+    
+    // Reload posts from global database to get updates from other users
+    const currentSection = document.querySelector('.section.active')?.id;
+    if (currentSection === 'feedSection') {
+        const savedGlobal = localStorage.getItem('starcopeGlobalPosts');
+        if (savedGlobal) {
+            const newPosts = JSON.parse(savedGlobal);
+            // Only update if there are new posts
+            if (newPosts.length !== allPosts.length) {
+                allPosts = newPosts;
+                allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                renderPosts();
+            }
+        }
+    }
 }, 5000);
