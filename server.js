@@ -4,7 +4,7 @@ const path = require('path');
 
 const app = express();
 const PORT = 5000;
-const ADMIN_PASSWORD = '1989';
+const ADMIN_PASSWORD = '091211';
 const EARNINGS_PER_VIEW = 2.0;
 
 const DATA_FILE = 'data.json';
@@ -91,7 +91,24 @@ app.post('/api/admin/withdraw', (req, res) => {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     
-    const { amount, note } = req.body;
+    const { gcash_number, amount, note } = req.body;
+    
+    if (!gcash_number || typeof gcash_number !== 'string') {
+        return res.status(400).json({ success: false, message: 'GCash number is required' });
+    }
+    
+    const gcashPattern = /^09\d{9}$/;
+    if (!gcashPattern.test(gcash_number)) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Invalid GCash number. Must be 11 digits starting with 09' 
+        });
+    }
+    
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid amount' });
+    }
+    
     const totalViews = data.views.length;
     const totalEarnings = totalViews * EARNINGS_PER_VIEW;
     const totalWithdrawn = data.withdrawals.reduce((sum, w) => sum + w.amount, 0);
@@ -102,16 +119,20 @@ app.post('/api/admin/withdraw', (req, res) => {
     }
     
     const withdrawal = {
+        gcash_number: gcash_number,
         amount: parseFloat(amount),
         note: note || '',
         timestamp: new Date().toISOString(),
-        status: 'completed'
+        status: 'pending'
     };
     
     data.withdrawals.push(withdrawal);
     saveData(data);
     
-    res.json({ success: true, message: 'Withdrawal successful' });
+    res.json({ 
+        success: true, 
+        message: `Withdrawal request submitted! ₱${amount.toFixed(2)} will be sent to ${gcash_number}` 
+    });
 });
 
 app.get('/api/stats', (req, res) => {

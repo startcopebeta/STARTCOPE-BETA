@@ -221,19 +221,19 @@
             
             <div class="stat-card">
                 <h3>💰 Total Earnings</h3>
-                <div class="value" id="total-earnings">$0.00</div>
-                <div class="subtitle">$2.00 per view</div>
+                <div class="value" id="total-earnings">₱0.00</div>
+                <div class="subtitle">₱2.00 per view</div>
             </div>
             
             <div class="stat-card">
                 <h3>💸 Total Withdrawn</h3>
-                <div class="value" id="total-withdrawn">$0.00</div>
+                <div class="value" id="total-withdrawn">₱0.00</div>
                 <div class="subtitle">Successfully withdrawn</div>
             </div>
             
             <div class="stat-card">
                 <h3>💵 Available Balance</h3>
-                <div class="value" id="available-balance">$0.00</div>
+                <div class="value" id="available-balance">₱0.00</div>
                 <div class="subtitle">Ready to withdraw</div>
             </div>
         </div>
@@ -243,16 +243,25 @@
             <div id="message" class="message"></div>
             <form class="withdrawal-form" id="withdrawal-form">
                 <div class="form-group">
-                    <label for="amount">Amount (USD)</label>
-                    <input type="number" id="amount" name="amount" step="0.01" min="0.01" 
-                           placeholder="Enter amount" required>
+                    <label for="gcash-number">📱 GCash Number</label>
+                    <input type="tel" id="gcash-number" name="gcash_number" 
+                           pattern="09[0-9]{9}" 
+                           placeholder="09XXXXXXXXX" 
+                           required
+                           title="Enter valid GCash number (09XXXXXXXXX)">
+                    <small style="opacity: 0.7; margin-top: 5px;">Format: 09XXXXXXXXX (11 digits)</small>
                 </div>
                 <div class="form-group">
-                    <label for="note">Note (Optional)</label>
+                    <label for="amount">💰 Amount (PHP)</label>
+                    <input type="number" id="amount" name="amount" step="0.01" min="0.01" 
+                           placeholder="Enter amount in pesos" required>
+                </div>
+                <div class="form-group">
+                    <label for="note">📝 Note (Optional)</label>
                     <textarea id="note" name="note" rows="3" 
                               placeholder="Add a note about this withdrawal"></textarea>
                 </div>
-                <button type="submit" class="btn-withdraw">💸 Withdraw Now</button>
+                <button type="submit" class="btn-withdraw">💸 Withdraw to GCash</button>
             </form>
         </div>
         
@@ -263,6 +272,7 @@
                     <thead>
                         <tr>
                             <th>Date & Time</th>
+                            <th>GCash Number</th>
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Note</th>
@@ -270,7 +280,7 @@
                     </thead>
                     <tbody id="withdrawals-table">
                         <tr>
-                            <td colspan="4" style="text-align: center; opacity: 0.6;">No withdrawals yet</td>
+                            <td colspan="5" style="text-align: center; opacity: 0.6;">No withdrawals yet</td>
                         </tr>
                     </tbody>
                 </table>
@@ -319,9 +329,9 @@
                 const data = await response.json();
                 
                 document.getElementById('total-views').textContent = data.totalViews;
-                document.getElementById('total-earnings').textContent = '$' + data.totalEarnings.toFixed(2);
-                document.getElementById('total-withdrawn').textContent = '$' + data.totalWithdrawn.toFixed(2);
-                document.getElementById('available-balance').textContent = '$' + data.availableBalance.toFixed(2);
+                document.getElementById('total-earnings').textContent = '₱' + data.totalEarnings.toFixed(2);
+                document.getElementById('total-withdrawn').textContent = '₱' + data.totalWithdrawn.toFixed(2);
+                document.getElementById('available-balance').textContent = '₱' + data.availableBalance.toFixed(2);
                 document.getElementById('amount').max = data.availableBalance;
                 
                 const withdrawalsTable = document.getElementById('withdrawals-table');
@@ -329,13 +339,14 @@
                     withdrawalsTable.innerHTML = data.withdrawals.map(w => `
                         <tr>
                             <td>${new Date(w.timestamp).toLocaleString()}</td>
-                            <td>$${w.amount.toFixed(2)}</td>
+                            <td>${w.gcash_number || 'N/A'}</td>
+                            <td>₱${w.amount.toFixed(2)}</td>
                             <td class="status-${w.status}">${w.status.toUpperCase()}</td>
                             <td>${w.note || '-'}</td>
                         </tr>
                     `).join('');
                 } else {
-                    withdrawalsTable.innerHTML = '<tr><td colspan="4" style="text-align: center; opacity: 0.6;">No withdrawals yet</td></tr>';
+                    withdrawalsTable.innerHTML = '<tr><td colspan="5" style="text-align: center; opacity: 0.6;">No withdrawals yet</td></tr>';
                 }
                 
                 const viewsTable = document.getElementById('views-table');
@@ -358,6 +369,7 @@
         document.getElementById('withdrawal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const gcashNumber = document.getElementById('gcash-number').value;
             const amount = document.getElementById('amount').value;
             const note = document.getElementById('note').value;
             const messageDiv = document.getElementById('message');
@@ -369,7 +381,11 @@
                         'Content-Type': 'application/json',
                         'Authorization': sessionId
                     },
-                    body: JSON.stringify({ amount: parseFloat(amount), note })
+                    body: JSON.stringify({ 
+                        gcash_number: gcashNumber,
+                        amount: parseFloat(amount), 
+                        note 
+                    })
                 });
                 
                 const data = await response.json();
