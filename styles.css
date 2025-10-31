@@ -187,6 +187,33 @@ header h1 {
     gap: 15px;
 }
 
+.search-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid var(--primary-color);
+    border-radius: 25px;
+    background: var(--background);
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
 #countrySelect {
     padding: 12px 20px;
     font-size: 16px;
@@ -289,10 +316,24 @@ header h1 {
     align-items: center;
     gap: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-width: 150px;
 }
 
 .info-icon {
     font-size: 1.5em;
+}
+
+.info-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-details small {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    opacity: 0.8;
 }
 
 .chatbot-modal, .settings-modal, .about-modal, .profile-modal {
@@ -482,7 +523,23 @@ header h1 {
 .settings-content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
+}
+
+.settings-section {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settings-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.2em;
 }
 
 .setting-item {

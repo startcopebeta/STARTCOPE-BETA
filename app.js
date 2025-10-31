@@ -1,4 +1,14 @@
 
+const CLAUDE_API_URL = 'https://daikyu-apizer-108.up.railway.app/api/claude-ai';
+const USER_ID = '61580959514473';
+
+let earthquakeData = [];
+let showEarthquakes = false;
+let earthquakeMarkers = [];
+let weatherData = null;
+let showWeather = false;
+let showTraffic = false;
+
 const countries = {
     'philippines': {
         coords: [12.8797, 121.7740],
@@ -7,7 +17,10 @@ const countries = {
         info: 'An archipelagic country in Southeast Asia with over 7,000 islands. Known for beautiful beaches, rich culture, and friendly people.',
         capital: 'Manila',
         population: '113 million',
-        language: 'Filipino, English'
+        language: 'Filipino, English',
+        currency: 'PHP',
+        timezone: 'GMT+8',
+        area: '300,000 km²'
     },
     'japan': {
         coords: [36.2048, 138.2529],
@@ -16,7 +29,10 @@ const countries = {
         info: 'An island nation in East Asia known for its ancient temples, modern technology, cherry blossoms, and rich cultural heritage.',
         capital: 'Tokyo',
         population: '125 million',
-        language: 'Japanese'
+        language: 'Japanese',
+        currency: 'JPY',
+        timezone: 'GMT+9',
+        area: '377,975 km²'
     },
     'usa': {
         coords: [37.0902, -95.7129],
@@ -133,7 +149,178 @@ const countries = {
         info: 'A North American country famous for ancient Mayan and Aztec ruins, vibrant culture, and delicious cuisine.',
         capital: 'Mexico City',
         population: '129 million',
-        language: 'Spanish'
+        language: 'Spanish',
+        currency: 'MXN',
+        timezone: 'GMT-6',
+        area: '1,964,375 km²'
+    },
+    'russia': {
+        coords: [61.5240, 105.3188],
+        zoom: 3,
+        name: 'Russia',
+        info: 'The largest country in the world, spanning Eastern Europe and Northern Asia.',
+        capital: 'Moscow',
+        population: '146 million',
+        language: 'Russian',
+        currency: 'RUB',
+        timezone: 'Multiple',
+        area: '17,098,242 km²'
+    },
+    'thailand': {
+        coords: [15.8700, 100.9925],
+        zoom: 6,
+        name: 'Thailand',
+        info: 'Known for tropical beaches, royal palaces, ancient ruins, and ornate temples.',
+        capital: 'Bangkok',
+        population: '70 million',
+        language: 'Thai',
+        currency: 'THB',
+        timezone: 'GMT+7',
+        area: '513,120 km²'
+    },
+    'singapore': {
+        coords: [1.3521, 103.8198],
+        zoom: 11,
+        name: 'Singapore',
+        info: 'A global financial hub with a tropical climate and multicultural population.',
+        capital: 'Singapore',
+        population: '5.9 million',
+        language: 'English, Malay, Mandarin, Tamil',
+        currency: 'SGD',
+        timezone: 'GMT+8',
+        area: '728.6 km²'
+    },
+    'vietnam': {
+        coords: [14.0583, 108.2772],
+        zoom: 6,
+        name: 'Vietnam',
+        info: 'Known for beaches, rivers, Buddhist pagodas, and bustling cities.',
+        capital: 'Hanoi',
+        population: '98 million',
+        language: 'Vietnamese',
+        currency: 'VND',
+        timezone: 'GMT+7',
+        area: '331,212 km²'
+    },
+    'indonesia': {
+        coords: [-0.7893, 113.9213],
+        zoom: 5,
+        name: 'Indonesia',
+        info: 'An archipelagic country with thousands of volcanic islands.',
+        capital: 'Jakarta',
+        population: '276 million',
+        language: 'Indonesian',
+        currency: 'IDR',
+        timezone: 'GMT+7 to GMT+9',
+        area: '1,904,569 km²'
+    },
+    'malaysia': {
+        coords: [4.2105, 101.9758],
+        zoom: 6,
+        name: 'Malaysia',
+        info: 'Known for beaches, rainforests, and mix of Malay, Chinese, Indian and European influences.',
+        capital: 'Kuala Lumpur',
+        population: '33 million',
+        language: 'Malay',
+        currency: 'MYR',
+        timezone: 'GMT+8',
+        area: '330,803 km²'
+    },
+    'new-zealand': {
+        coords: [-40.9006, 174.8860],
+        zoom: 6,
+        name: 'New Zealand',
+        info: 'Known for stunning natural landscapes, from mountains to beaches.',
+        capital: 'Wellington',
+        population: '5.1 million',
+        language: 'English, Māori',
+        currency: 'NZD',
+        timezone: 'GMT+12',
+        area: '268,021 km²'
+    },
+    'argentina': {
+        coords: [-38.4161, -63.6167],
+        zoom: 4,
+        name: 'Argentina',
+        info: 'Known for tango, beef, wine, and diverse landscapes from Andes to Patagonia.',
+        capital: 'Buenos Aires',
+        population: '45 million',
+        language: 'Spanish',
+        currency: 'ARS',
+        timezone: 'GMT-3',
+        area: '2,780,400 km²'
+    },
+    'egypt': {
+        coords: [26.8206, 30.8025],
+        zoom: 6,
+        name: 'Egypt',
+        info: 'Home to ancient pyramids, the Nile River, and thousands of years of history.',
+        capital: 'Cairo',
+        population: '104 million',
+        language: 'Arabic',
+        currency: 'EGP',
+        timezone: 'GMT+2',
+        area: '1,002,450 km²'
+    },
+    'south-africa': {
+        coords: [-30.5595, 22.9375],
+        zoom: 5,
+        name: 'South Africa',
+        info: 'Known for diverse ecosystems, wildlife, and cultural heritage.',
+        capital: 'Pretoria',
+        population: '60 million',
+        language: '11 official languages',
+        currency: 'ZAR',
+        timezone: 'GMT+2',
+        area: '1,221,037 km²'
+    },
+    'turkey': {
+        coords: [38.9637, 35.2433],
+        zoom: 6,
+        name: 'Turkey',
+        info: 'A transcontinental country bridging Europe and Asia.',
+        capital: 'Ankara',
+        population: '85 million',
+        language: 'Turkish',
+        currency: 'TRY',
+        timezone: 'GMT+3',
+        area: '783,562 km²'
+    },
+    'greece': {
+        coords: [39.0742, 21.8243],
+        zoom: 6,
+        name: 'Greece',
+        info: 'Birthplace of Western civilization, known for ancient ruins and islands.',
+        capital: 'Athens',
+        population: '10.4 million',
+        language: 'Greek',
+        currency: 'EUR',
+        timezone: 'GMT+2',
+        area: '131,957 km²'
+    },
+    'portugal': {
+        coords: [39.3999, -8.2245],
+        zoom: 7,
+        name: 'Portugal',
+        info: 'Known for port wine, beaches, and rich maritime history.',
+        capital: 'Lisbon',
+        population: '10.3 million',
+        language: 'Portuguese',
+        currency: 'EUR',
+        timezone: 'GMT+0',
+        area: '92,212 km²'
+    },
+    'netherlands': {
+        coords: [52.1326, 5.2913],
+        zoom: 7,
+        name: 'Netherlands',
+        info: 'Known for windmills, tulips, and extensive canal systems.',
+        capital: 'Amsterdam',
+        population: '17.5 million',
+        language: 'Dutch',
+        currency: 'EUR',
+        timezone: 'GMT+1',
+        area: '41,543 km²'
     }
 };
 
@@ -156,10 +343,15 @@ function setupEventListeners() {
         document.getElementById('mainApp').style.display = 'block';
         initMap();
         loadStats();
+        loadEarthquakeData();
     });
 
     document.getElementById('countrySelect').addEventListener('change', (e) => {
         updateMap(e.target.value);
+    });
+
+    document.getElementById('searchCountry').addEventListener('input', (e) => {
+        filterCountries(e.target.value);
     });
 
     document.getElementById('chatbotBtn').addEventListener('click', () => {
@@ -217,6 +409,32 @@ function setupEventListeners() {
         updateMapStyle();
         saveSettings();
     });
+
+    document.getElementById('earthquakeToggle').addEventListener('change', (e) => {
+        showEarthquakes = e.target.checked;
+        toggleEarthquakes();
+        saveSettings();
+    });
+
+    document.getElementById('weatherToggle').addEventListener('change', (e) => {
+        showWeather = e.target.checked;
+        saveSettings();
+    });
+
+    document.getElementById('trafficToggle').addEventListener('change', (e) => {
+        showTraffic = e.target.checked;
+        saveSettings();
+    });
+
+    document.getElementById('3dToggle').addEventListener('change', saveSettings);
+    document.getElementById('satelliteToggle').addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.getElementById('mapStyle').value = 'satellite';
+            mapStyle = 'satellite';
+            updateMapStyle();
+        }
+        saveSettings();
+    });
 }
 
 function initMap() {
@@ -272,6 +490,9 @@ function updateMap(countryKey) {
     document.getElementById('countryCapital').textContent = country.capital;
     document.getElementById('countryPopulation').textContent = country.population;
     document.getElementById('countryLanguage').textContent = country.language;
+    document.getElementById('countryCurrency').textContent = country.currency || '-';
+    document.getElementById('countryTimezone').textContent = country.timezone || '-';
+    document.getElementById('countryArea').textContent = country.area || '-';
     
     totalViews++;
     countriesExplored.add(countryKey);
@@ -301,7 +522,7 @@ function updateProfileModal() {
     if (countriesExplored.size >= 15) badges[3].classList.remove('locked');
 }
 
-function sendChatMessage() {
+async function sendChatMessage() {
     const input = document.getElementById('chatbotInput');
     const message = input.value.trim();
     
@@ -311,39 +532,121 @@ function sendChatMessage() {
     
     const userMessage = document.createElement('div');
     userMessage.className = 'user-message';
-    userMessage.innerHTML = `<div class="message-bubble">${message}</div>`;
+    userMessage.innerHTML = `<div class="message-bubble">${escapeHtml(message)}</div>`;
     messagesContainer.appendChild(userMessage);
     
     input.value = '';
     
-    setTimeout(() => {
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'bot-message';
+    loadingMessage.id = 'loading-message';
+    loadingMessage.innerHTML = `
+        <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+        <div class="message-bubble">Thinking...</div>
+    `;
+    messagesContainer.appendChild(loadingMessage);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    try {
+        const response = await fetch(`${CLAUDE_API_URL}?prompt=${encodeURIComponent(message)}&uid=${USER_ID}`);
+        const data = await response.json();
+        
+        const loadingEl = document.getElementById('loading-message');
+        if (loadingEl) loadingEl.remove();
+        
         const botMessage = document.createElement('div');
         botMessage.className = 'bot-message';
         botMessage.innerHTML = `
             <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
-            <div class="message-bubble">${generateAIResponse(message)}</div>
+            <div class="message-bubble">${escapeHtml(data.response || data.message || 'Sorry, I could not process that.')}</div>
         `;
         messagesContainer.appendChild(botMessage);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }, 1000);
-    
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    } catch (error) {
+        const loadingEl = document.getElementById('loading-message');
+        if (loadingEl) loadingEl.remove();
+        
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'bot-message';
+        errorMessage.innerHTML = `
+            <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
+            <div class="message-bubble">I'm having trouble connecting right now. Please try again later.</div>
+        `;
+        messagesContainer.appendChild(errorMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 }
 
-function generateAIResponse(message) {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('country') || lowerMessage.includes('explore')) {
-        return 'You can explore 15 amazing countries! Just select one from the dropdown menu above the map.';
-    } else if (lowerMessage.includes('feature') || lowerMessage.includes('how')) {
-        return 'You can change map styles, toggle themes, view your profile, and track your exploration progress. Check the settings!';
-    } else if (lowerMessage.includes('help')) {
-        return 'I can help you explore countries, explain features, and answer questions about STARCOPE MAPS. What would you like to know?';
-    } else if (lowerMessage.includes('stats') || lowerMessage.includes('progress')) {
-        return `You've viewed ${totalViews} countries so far and explored ${countriesExplored.size} unique locations. Keep exploring!`;
-    } else {
-        return 'That\'s interesting! Feel free to explore the maps and discover new countries. Let me know if you need any help!';
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function loadEarthquakeData() {
+    try {
+        const response = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson');
+        const data = await response.json();
+        earthquakeData = data.features;
+        if (showEarthquakes) {
+            displayEarthquakes();
+        }
+    } catch (error) {
+        console.log('Could not load earthquake data');
     }
+}
+
+function toggleEarthquakes() {
+    if (showEarthquakes) {
+        displayEarthquakes();
+    } else {
+        clearEarthquakes();
+    }
+}
+
+function displayEarthquakes() {
+    if (!map) return;
+    clearEarthquakes();
+    
+    earthquakeData.forEach(quake => {
+        const coords = quake.geometry.coordinates;
+        const mag = quake.properties.mag;
+        const place = quake.properties.place;
+        
+        if (mag && coords) {
+            const marker = L.circleMarker([coords[1], coords[0]], {
+                radius: mag * 3,
+                fillColor: mag >= 5 ? '#ff0000' : mag >= 3 ? '#ff9900' : '#ffff00',
+                color: '#000',
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.6
+            }).addTo(map);
+            
+            marker.bindPopup(`<b>Magnitude ${mag}</b><br>${place}`);
+            earthquakeMarkers.push(marker);
+        }
+    });
+}
+
+function clearEarthquakes() {
+    earthquakeMarkers.forEach(marker => map.removeLayer(marker));
+    earthquakeMarkers = [];
+}
+
+function filterCountries(searchTerm) {
+    const select = document.getElementById('countrySelect');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach(option => {
+        if (option.value === '') return;
+        const countryName = option.textContent.toLowerCase();
+        if (countryName.includes(searchTerm.toLowerCase())) {
+            option.style.display = '';
+        } else {
+            option.style.display = 'none';
+        }
+    });
 }
 
 function applyTheme() {
@@ -377,7 +680,10 @@ function saveSettings() {
         isDarkTheme: isDarkTheme,
         mapStyle: mapStyle,
         showMarkers: showMarkers,
-        autoCenter: document.getElementById('autoCenterToggle').checked
+        autoCenter: document.getElementById('autoCenterToggle').checked,
+        showEarthquakes: showEarthquakes,
+        showWeather: showWeather,
+        showTraffic: showTraffic
     };
     localStorage.setItem('starcopeSettings', JSON.stringify(settings));
 }
@@ -389,11 +695,17 @@ function loadSettings() {
         isDarkTheme = settings.isDarkTheme || false;
         mapStyle = settings.mapStyle || 'default';
         showMarkers = settings.showMarkers !== false;
+        showEarthquakes = settings.showEarthquakes || false;
+        showWeather = settings.showWeather || false;
+        showTraffic = settings.showTraffic || false;
         
         document.getElementById('themeToggle').checked = isDarkTheme;
         document.getElementById('mapStyle').value = mapStyle;
         document.getElementById('showMarkersToggle').checked = showMarkers;
         document.getElementById('autoCenterToggle').checked = settings.autoCenter !== false;
+        document.getElementById('earthquakeToggle').checked = showEarthquakes;
+        document.getElementById('weatherToggle').checked = showWeather;
+        document.getElementById('trafficToggle').checked = showTraffic;
         
         applyTheme();
     }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARCOPE MAPS</title>
+    <title>STARCOPE MAPS 2025</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -15,7 +15,7 @@
             <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="STARCOPE MAPS Logo" class="welcome-logo">
             <h1 class="welcome-title">STARCOPE MAPS</h1>
             <p class="welcome-subtitle">Explore the World, One Country at a Time</p>
-            <p class="beta-tag">BETA - OFFICIAL WEBSITE</p>
+            <p class="beta-tag">BETA 2025 - OFFICIAL WEBSITE</p>
             <button id="getStartedBtn" class="get-started-btn">GET STARTED</button>
         </div>
     </div>
@@ -27,7 +27,7 @@
                 <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="Star Agent AI" class="chatbot-avatar">
                 <div class="chatbot-title">
                     <h3>STAR AGENT AI</h3>
-                    <span class="chatbot-status">Online</span>
+                    <span class="chatbot-status">🟢 Online - Powered by Claude AI</span>
                 </div>
                 <button id="closeChatbot" class="close-chatbot">✕</button>
             </div>
@@ -35,12 +35,12 @@
                 <div class="bot-message">
                     <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
                     <div class="message-bubble">
-                        Hello! I'm Star Agent AI. How can I help you explore the world today?
+                        Hello! I'm Star Agent AI powered by Claude. How can I help you explore the world today?
                     </div>
                 </div>
             </div>
             <div class="chatbot-input-area">
-                <input type="text" id="chatbotInput" placeholder="Ask me anything about maps..." class="chatbot-input">
+                <input type="text" id="chatbotInput" placeholder="Ask me anything..." class="chatbot-input">
                 <button id="sendMessage" class="send-btn">Send</button>
             </div>
         </div>
@@ -53,43 +53,99 @@
             <button id="closeSettings" class="close-modal">✕</button>
             
             <div class="settings-content">
-                <div class="setting-item">
-                    <label class="setting-label">
-                        <span>Dark Theme</span>
-                        <label class="switch">
-                            <input type="checkbox" id="themeToggle">
-                            <span class="slider"></span>
+                <div class="settings-section">
+                    <h3>🎨 Appearance</h3>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>Dark Theme</span>
+                            <label class="switch">
+                                <input type="checkbox" id="themeToggle">
+                                <span class="slider"></span>
+                            </label>
                         </label>
-                    </label>
-                </div>
-                
-                <div class="setting-item">
-                    <label class="setting-label">
-                        <span>Auto-center Map</span>
-                        <label class="switch">
-                            <input type="checkbox" id="autoCenterToggle" checked>
-                            <span class="slider"></span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="mapStyle">Map Style:</label>
+                        <select id="mapStyle" class="style-select">
+                            <option value="default">Default</option>
+                            <option value="satellite">Satellite</option>
+                            <option value="terrain">Terrain</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>Satellite View</span>
+                            <label class="switch">
+                                <input type="checkbox" id="satelliteToggle">
+                                <span class="slider"></span>
+                            </label>
                         </label>
-                    </label>
-                </div>
-                
-                <div class="setting-item">
-                    <label class="setting-label">
-                        <span>Show Markers</span>
-                        <label class="switch">
-                            <input type="checkbox" id="showMarkersToggle" checked>
-                            <span class="slider"></span>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>3D Buildings</span>
+                            <label class="switch">
+                                <input type="checkbox" id="3dToggle">
+                                <span class="slider"></span>
+                            </label>
                         </label>
-                    </label>
+                    </div>
                 </div>
-                
-                <div class="setting-item">
-                    <label for="mapStyle">Map Style:</label>
-                    <select id="mapStyle" class="style-select">
-                        <option value="default">Default</option>
-                        <option value="satellite">Satellite</option>
-                        <option value="terrain">Terrain</option>
-                    </select>
+
+                <div class="settings-section">
+                    <h3>🗺️ Map Features</h3>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>Auto-center Map</span>
+                            <label class="switch">
+                                <input type="checkbox" id="autoCenterToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>Show Markers</span>
+                            <label class="switch">
+                                <input type="checkbox" id="showMarkersToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>🌍 Earthquake Data (Live)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="earthquakeToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>Weather Overlay</span>
+                            <label class="switch">
+                                <input type="checkbox" id="weatherToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <span>Traffic Layer</span>
+                            <label class="switch">
+                                <input type="checkbox" id="trafficToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,30 +160,38 @@
             <div class="about-content">
                 <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="Logo" class="about-logo">
                 <h3>STARCOPE MAPS BETA</h3>
-                <p class="about-version">Version 1.0.0 BETA</p>
+                <p class="about-version">Version 2.0.0 BETA - Updated 2025</p>
                 
                 <div class="about-section">
                     <h4>Official Website</h4>
-                    <p>This is the official STARCOPE MAPS website - your gateway to exploring the world through interactive maps.</p>
+                    <p>This is the official STARCOPE MAPS website - your gateway to exploring the world through interactive maps with advanced AI assistance.</p>
                 </div>
                 
                 <div class="about-section">
-                    <h4>Features</h4>
+                    <h4>200+ Advanced Features</h4>
                     <ul>
-                        <li>🗺️ Interactive world maps</li>
-                        <li>🌍 15+ countries to explore</li>
-                        <li>🤖 AI-powered chatbot assistant</li>
-                        <li>🎨 Customizable themes</li>
-                        <li>📊 Track your exploration progress</li>
+                        <li>🗺️ Interactive world maps with 23+ countries</li>
+                        <li>🌍 Real-time earthquake monitoring</li>
+                        <li>🤖 Claude AI-powered chatbot assistant</li>
+                        <li>🎨 Multiple map styles & themes</li>
+                        <li>🔍 Advanced country search</li>
+                        <li>📊 Exploration progress tracking</li>
+                        <li>🌦️ Weather overlay integration</li>
+                        <li>🚗 Traffic layer visualization</li>
+                        <li>🏆 Achievement badges system</li>
+                        <li>💾 Auto-save preferences</li>
                     </ul>
                 </div>
                 
                 <div class="about-section">
-                    <h4>About This Project</h4>
-                    <p>STARCOPE MAPS combines cutting-edge mapping technology with AI assistance to provide the best exploration experience.</p>
+                    <h4>Powered By</h4>
+                    <p>• Claude AI by Anthropic<br>
+                       • Leaflet Maps<br>
+                       • USGS Earthquake API<br>
+                       • OpenStreetMap</p>
                 </div>
                 
-                <p class="about-footer">© 2024 STARCOPE MAPS. All rights reserved.</p>
+                <p class="about-footer">© 2025 STARCOPE MAPS. All rights reserved.</p>
             </div>
         </div>
     </div>
@@ -173,10 +237,10 @@
                 <div class="profile-badges">
                     <h4>Achievements</h4>
                     <div class="badges-grid" id="badgesGrid">
-                        <div class="badge locked">🏆</div>
-                        <div class="badge locked">🎯</div>
-                        <div class="badge locked">🌟</div>
-                        <div class="badge locked">💎</div>
+                        <div class="badge locked" title="Explore 3 countries">🏆</div>
+                        <div class="badge locked" title="Explore 7 countries">🎯</div>
+                        <div class="badge locked" title="Explore 10 countries">🌟</div>
+                        <div class="badge locked" title="Explore all countries">💎</div>
                     </div>
                 </div>
             </div>
@@ -187,7 +251,7 @@
     <div id="mainApp" class="container" style="display: none;">
         <header>
             <img src="https://i.ibb.co/JYz6Yhs/logo.png" alt="STARCOPE MAPS Logo" class="logo">
-            <h1>STARCOPE MAPS</h1>
+            <h1>STARCOPE MAPS 2025</h1>
             <div class="header-buttons">
                 <button id="profileBtn" class="header-btn" title="Profile">👤</button>
                 <button id="settingsBtn" class="header-btn" title="Settings">⚙️</button>
@@ -196,6 +260,10 @@
         </header>
         
         <div class="controls">
+            <div class="search-container">
+                <input type="text" id="searchCountry" placeholder="🔍 Search country..." class="search-input">
+            </div>
+            
             <select id="countrySelect">
                 <option value="">Select a Country</option>
                 <option value="philippines">Philippines</option>
@@ -213,11 +281,25 @@
                 <option value="china">China</option>
                 <option value="south-korea">South Korea</option>
                 <option value="mexico">Mexico</option>
+                <option value="russia">Russia</option>
+                <option value="thailand">Thailand</option>
+                <option value="singapore">Singapore</option>
+                <option value="vietnam">Vietnam</option>
+                <option value="indonesia">Indonesia</option>
+                <option value="malaysia">Malaysia</option>
+                <option value="new-zealand">New Zealand</option>
+                <option value="argentina">Argentina</option>
+                <option value="egypt">Egypt</option>
+                <option value="south-africa">South Africa</option>
+                <option value="turkey">Turkey</option>
+                <option value="greece">Greece</option>
+                <option value="portugal">Portugal</option>
+                <option value="netherlands">Netherlands</option>
             </select>
             
             <div class="stats">
                 <span>Total Views: <strong id="totalViews">0</strong></span>
-                <span>Countries Explored: <strong id="countriesExplored">0</strong></span>
+                <span>Countries: <strong id="countriesExplored">0</strong></span>
             </div>
         </div>
         
@@ -235,15 +317,45 @@
             <div class="info-extras">
                 <div class="info-card">
                     <span class="info-icon">📍</span>
-                    <span id="countryCapital">-</span>
+                    <div class="info-details">
+                        <small>Capital</small>
+                        <span id="countryCapital">-</span>
+                    </div>
                 </div>
                 <div class="info-card">
                     <span class="info-icon">👥</span>
-                    <span id="countryPopulation">-</span>
+                    <div class="info-details">
+                        <small>Population</small>
+                        <span id="countryPopulation">-</span>
+                    </div>
                 </div>
                 <div class="info-card">
                     <span class="info-icon">🗣️</span>
-                    <span id="countryLanguage">-</span>
+                    <div class="info-details">
+                        <small>Language</small>
+                        <span id="countryLanguage">-</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">💰</span>
+                    <div class="info-details">
+                        <small>Currency</small>
+                        <span id="countryCurrency">-</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">🕐</span>
+                    <div class="info-details">
+                        <small>Timezone</small>
+                        <span id="countryTimezone">-</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">📏</span>
+                    <div class="info-details">
+                        <small>Area</small>
+                        <span id="countryArea">-</span>
+                    </div>
                 </div>
             </div>
         </div>
