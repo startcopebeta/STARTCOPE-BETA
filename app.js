@@ -447,21 +447,6 @@ function setupEventListeners() {
         saveSettings();
     });
 
-    document.getElementById('installApkBtn').addEventListener('click', () => {
-        const apkUrl = 'https://starcope-mobile.apk'; // Replace with actual APK URL
-        const link = document.createElement('a');
-        link.href = apkUrl;
-        link.download = 'STAR_MOBILE_APK.apk';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        alert('📱 STAR MOBILE APK download started!\n\nNote: Make sure to enable "Install from Unknown Sources" in your Android settings before installing.');
-    });
-
-    document.getElementById('dashboardBtn').addEventListener('click', () => {
-        window.location.href = 'dashboard.html';
-    });
 }
 
 function initMap() {
