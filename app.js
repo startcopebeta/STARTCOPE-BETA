@@ -1,5 +1,5 @@
 
-const CLAUDE_API_URL = 'https://daikyu-apizer-108.up.railway.app/api/claude-ai';
+const GEMINI_API_URL = 'https://betadash-api-swordslush-production.up.railway.app/gemini';
 const USER_ID = '61580959514473';
 const PHIVOLCS_API_URL = 'https://betadash-api-swordslush-production.up.railway.app/phivolcs';
 
@@ -589,7 +589,7 @@ async function sendChatMessage() {
     }
     
     try {
-        const response = await fetch(`${CLAUDE_API_URL}?prompt=${encodeURIComponent(message)}&uid=${USER_ID}`);
+        const response = await fetch(`${GEMINI_API_URL}?ask=${encodeURIComponent(message)}`);
         const data = await response.json();
         
         const loadingEl = document.getElementById('loading-message');
@@ -599,7 +599,7 @@ async function sendChatMessage() {
         botMessage.className = 'bot-message';
         botMessage.innerHTML = `
             <img src="https://i.ibb.co/V4W1p7M/profile.png" alt="AI" class="message-avatar">
-            <div class="message-bubble">${escapeHtml(data.response || data.message || 'Sorry, I could not process that.')}</div>
+            <div class="message-bubble">${escapeHtml(data.response || 'Sorry, I could not process that.')}</div>
         `;
         messagesContainer.appendChild(botMessage);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;

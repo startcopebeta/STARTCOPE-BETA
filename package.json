@@ -1,0 +1,12 @@
+{
+  "name": "starcope-maps",
+  "version": "1.0.0",
+  "description": "STARCOPE MAPS application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
