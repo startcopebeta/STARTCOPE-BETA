@@ -11,6 +11,7 @@ const listenerCount = document.getElementById('listenerCount');
 const tickerText = document.getElementById('tickerText');
 const contactForm = document.getElementById('contactForm');
 const radioStream = document.getElementById('radioStream');
+const getStartedBtn = document.getElementById('getStartedBtn');
 
 // Navigation
 const navLinks = document.querySelectorAll('.nav-link');
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     startNewsTicker();
     updateListenerCount();
+    initializeGetStarted();
     
     // Update program every minute
     setInterval(updateCurrentProgram, 60000);
@@ -85,6 +87,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Rotate news ticker every 10 seconds
     setInterval(updateNewsTicker, 10000);
 });
+
+// GET STARTED Button Functionality
+function initializeGetStarted() {
+    getStartedBtn.addEventListener('click', () => {
+        // Scroll to radio player smoothly
+        const radioPlayer = document.querySelector('.radio-player');
+        radioPlayer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Add pulse effect
+        getStartedBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            getStartedBtn.style.transform = '';
+        }, 200);
+        
+        // Auto-start playing after scroll
+        setTimeout(() => {
+            if (!isPlaying) {
+                togglePlay();
+            }
+        }, 800);
+    });
+}
 
 // Play/Pause Functionality
 function initializePlayer() {
