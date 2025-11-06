@@ -172,7 +172,18 @@ Expires: 0
 
 ## Recent Changes
 
-**November 6, 2025**
+**November 6, 2025 - Latest Update**
+- Enhanced background theme with modern multi-layered gradients
+- Added animated radial glow effects throughout the site
+- Implemented GET STARTED button with auto-play functionality
+- Added Learn More button for smooth navigation
+- Enhanced radio player with glassmorphism effects
+- Improved news ticker with animated gradient backgrounds
+- Enhanced news cards with hover glow effects
+- Added section-specific gradient overlays for visual depth
+- Improved hero section with full-height layout and animations
+
+**November 6, 2025 - Initial Release**
 - Created complete radio station website for BRIGADA NEWS FM
 - Implemented HTML5 audio streaming with error handling
 - Added comprehensive CSS styling with animations
