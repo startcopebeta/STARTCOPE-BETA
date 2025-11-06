@@ -1,63 +1,37 @@
-// Radio Player State
 let isPlaying = false;
 let currentVolume = 70;
+let currentStation = null;
+let likeCount = 1234;
+let commentCount = 89;
+let favorites = [];
 
-// DOM Elements
-const playBtn = document.getElementById('playBtn');
-const volumeSlider = document.getElementById('volumeSlider');
-const playIcon = document.querySelector('.play-icon');
-const pauseIcon = document.querySelector('.pause-icon');
-const listenerCount = document.getElementById('listenerCount');
-const tickerText = document.getElementById('tickerText');
-const contactForm = document.getElementById('contactForm');
 const radioStream = document.getElementById('radioStream');
-const getStartedBtn = document.getElementById('getStartedBtn');
+const playBtnFixed = document.getElementById('playBtnFixed');
+const playIconFixed = document.getElementById('playIconFixed');
+const pauseIconFixed = document.getElementById('pauseIconFixed');
+const volumeSliderFixed = document.getElementById('volumeSliderFixed');
+const playerStationName = document.getElementById('playerStationName');
+const playerStationFrequency = document.getElementById('playerStationFrequency');
+const playerStationLogo = document.getElementById('playerStationLogo');
 
-// Navigation
+const menuDotsBtn = document.getElementById('menuDotsBtn');
+const socialMenuModal = document.getElementById('socialMenuModal');
+const closeSocialMenu = document.getElementById('closeSocialMenu');
+const postBtn = document.getElementById('postBtn');
+const commentBtn = document.getElementById('commentBtn');
+const postCreationArea = document.getElementById('postCreationArea');
+const commentsSection = document.getElementById('commentsSection');
+const submitPostBtn = document.getElementById('submitPostBtn');
+const cancelPostBtn = document.getElementById('cancelPostBtn');
+const submitCommentBtn = document.getElementById('submitCommentBtn');
+const postTextarea = document.getElementById('postTextarea');
+const commentInput = document.getElementById('commentInput');
+const commentsList = document.getElementById('commentsList');
+
 const navLinks = document.querySelectorAll('.nav-link');
 const sections = document.querySelectorAll('section');
+const tickerText = document.getElementById('tickerText');
 
-// Programs Schedule
-const programs = [
-    {
-        time: '6:00-9:00',
-        name: 'Brigada Umaga',
-        host: 'DJ Mike Santos',
-        timeRange: [6, 9]
-    },
-    {
-        time: '9:00-12:00',
-        name: 'Brigada Balita',
-        host: 'Maria Cruz',
-        timeRange: [9, 12]
-    },
-    {
-        time: '12:00-15:00',
-        name: 'Tanghali Patrol',
-        host: 'Jun Reyes',
-        timeRange: [12, 15]
-    },
-    {
-        time: '15:00-18:00',
-        name: 'Hapon Express',
-        host: 'Sarah Gonzales',
-        timeRange: [15, 18]
-    },
-    {
-        time: '18:00-21:00',
-        name: 'Gabi ng Balita',
-        host: 'Tony Villanueva',
-        timeRange: [18, 21]
-    },
-    {
-        time: '21:00-24:00',
-        name: 'Nightcap News',
-        host: 'DJ Mica',
-        timeRange: [21, 24]
-    }
-];
-
-// Breaking News Ticker
 const newsItems = [
     'Welcome to Brigada News FM - Your trusted source for news and information',
     'BREAKING: Mahalagang anunsyo mula sa pamahalaan tungkol sa bagong patakaran',
@@ -66,59 +40,28 @@ const newsItems = [
     'LOCAL NEWS: Bagong health facility binuksan sa Quezon City',
     'SPORTS: Local basketball team nanalo sa championship game'
 ];
-
 let currentNewsIndex = 0;
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    updateCurrentProgram();
     initializePlayer();
+    initializeStations();
     initializeNavigation();
+    initializeSocialMenu();
     startNewsTicker();
-    updateListenerCount();
-    initializeGetStarted();
     
-    // Update program every minute
-    setInterval(updateCurrentProgram, 60000);
-    
-    // Update listener count every 5 seconds
-    setInterval(updateListenerCount, 5000);
-    
-    // Rotate news ticker every 10 seconds
     setInterval(updateNewsTicker, 10000);
+    
+    const defaultStation = radioStations[0];
+    updatePlayerUI(defaultStation);
+    currentStation = defaultStation;
 });
 
-// GET STARTED Button Functionality
-function initializeGetStarted() {
-    getStartedBtn.addEventListener('click', () => {
-        // Scroll to radio player smoothly
-        const radioPlayer = document.querySelector('.radio-player');
-        radioPlayer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Add pulse effect
-        getStartedBtn.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            getStartedBtn.style.transform = '';
-        }, 200);
-        
-        // Auto-start playing after scroll
-        setTimeout(() => {
-            if (!isPlaying) {
-                togglePlay();
-            }
-        }, 800);
-    });
-}
-
-// Play/Pause Functionality
 function initializePlayer() {
-    playBtn.addEventListener('click', togglePlay);
-    volumeSlider.addEventListener('input', updateVolume);
+    playBtnFixed.addEventListener('click', togglePlay);
+    volumeSliderFixed.addEventListener('input', updateVolume);
     
-    // Set initial volume
     radioStream.volume = currentVolume / 100;
     
-    // Handle audio events
     radioStream.addEventListener('play', () => {
         console.log('Audio started playing');
     });
@@ -137,42 +80,32 @@ function initializePlayer() {
 
 function togglePlay() {
     if (!isPlaying) {
-        // Try to start playing
         isPlaying = true;
-        playIcon.style.display = 'none';
-        pauseIcon.style.display = 'block';
-        playBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
+        playIconFixed.style.display = 'none';
+        pauseIconFixed.style.display = 'block';
         
-        // Play the actual audio stream
         radioStream.play().catch(err => {
             console.error('Playback failed:', err);
             handleStreamError('Unable to connect to the live stream. Please try again.');
         });
     } else {
-        // Stop playing
         isPlaying = false;
-        playIcon.style.display = 'block';
-        pauseIcon.style.display = 'none';
-        playBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+        playIconFixed.style.display = 'block';
+        pauseIconFixed.style.display = 'none';
         
-        // Pause the actual audio stream
         radioStream.pause();
     }
 }
 
 function handleStreamError(message) {
-    // Reset UI to stopped state
     isPlaying = false;
-    playIcon.style.display = 'block';
-    pauseIcon.style.display = 'none';
-    playBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+    playIconFixed.style.display = 'block';
+    pauseIconFixed.style.display = 'none';
     
-    // Show error to user
     showNotification(message, 'error');
 }
 
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
@@ -192,7 +125,6 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Remove after 4 seconds
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
@@ -202,34 +134,200 @@ function showNotification(message, type = 'info') {
 function updateVolume(e) {
     currentVolume = e.target.value;
     radioStream.volume = currentVolume / 100;
-    console.log('Volume:', currentVolume + '%');
 }
 
-// Update Current Program based on time
-function updateCurrentProgram() {
-    const now = new Date();
-    const currentHour = now.getHours();
+function initializeStations() {
+    const stationsGrid = document.getElementById('stationsGrid');
+    const filterTabs = document.querySelectorAll('.filter-tab');
     
-    const currentProgram = programs.find(program => {
-        return currentHour >= program.timeRange[0] && currentHour < program.timeRange[1];
+    function renderStations(category = 'all') {
+        stationsGrid.innerHTML = '';
+        
+        const filteredStations = category === 'all' 
+            ? radioStations 
+            : radioStations.filter(station => station.category === category);
+        
+        filteredStations.forEach(station => {
+            const stationCard = document.createElement('div');
+            stationCard.className = 'station-card';
+            stationCard.innerHTML = `
+                <div class="station-header">
+                    <div class="station-logo">${station.logo}</div>
+                    <div class="station-info">
+                        <h3>${station.name}</h3>
+                        <div class="station-frequency">${station.frequency}</div>
+                    </div>
+                </div>
+                <div class="station-location">
+                    <i class="fas fa-map-marker-alt"></i> ${station.location}
+                </div>
+                <div class="station-description">${station.description}</div>
+                <div class="station-actions">
+                    <button class="play-station-btn" data-station-id="${station.id}">
+                        <i class="fas fa-play"></i> Play
+                    </button>
+                    <button class="favorite-btn ${favorites.includes(station.id) ? 'favorited' : ''}" data-station-id="${station.id}">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            `;
+            
+            const playBtn = stationCard.querySelector('.play-station-btn');
+            playBtn.addEventListener('click', () => playStation(station));
+            
+            const favBtn = stationCard.querySelector('.favorite-btn');
+            favBtn.addEventListener('click', (e) => toggleFavorite(station.id, e.target.closest('.favorite-btn')));
+            
+            stationsGrid.appendChild(stationCard);
+        });
+    }
+    
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const category = tab.getAttribute('data-category');
+            renderStations(category);
+        });
     });
     
-    if (currentProgram) {
-        document.getElementById('currentProgram').textContent = currentProgram.name;
-        document.getElementById('currentHost').textContent = currentProgram.host;
-        
-        // Update active schedule card
-        const scheduleCards = document.querySelectorAll('.schedule-card');
-        scheduleCards.forEach((card, index) => {
-            card.classList.remove('active');
-            if (programs[index] === currentProgram) {
-                card.classList.add('active');
-            }
-        });
+    renderStations();
+}
+
+function playStation(station) {
+    if (currentStation && currentStation.id === station.id && isPlaying) {
+        togglePlay();
+        return;
+    }
+    
+    radioStream.src = station.stream;
+    currentStation = station;
+    updatePlayerUI(station);
+    
+    if (!isPlaying) {
+        togglePlay();
+    } else {
+        radioStream.play();
+    }
+    
+    showNotification(`Now playing: ${station.name}`, 'info');
+    
+    document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updatePlayerUI(station) {
+    playerStationName.textContent = station.name;
+    playerStationFrequency.textContent = station.frequency;
+    playerStationLogo.textContent = station.logo;
+}
+
+function toggleFavorite(stationId, btn) {
+    const index = favorites.indexOf(stationId);
+    if (index > -1) {
+        favorites.splice(index, 1);
+        btn.classList.remove('favorited');
+        showNotification('Removed from favorites', 'info');
+    } else {
+        favorites.push(stationId);
+        btn.classList.add('favorited');
+        showNotification('Added to favorites', 'info');
     }
 }
 
-// Navigation
+function initializeSocialMenu() {
+    menuDotsBtn.addEventListener('click', () => {
+        socialMenuModal.classList.add('active');
+    });
+    
+    closeSocialMenu.addEventListener('click', () => {
+        socialMenuModal.classList.remove('active');
+        postCreationArea.style.display = 'none';
+        commentsSection.style.display = 'none';
+    });
+    
+    socialMenuModal.addEventListener('click', (e) => {
+        if (e.target === socialMenuModal) {
+            socialMenuModal.classList.remove('active');
+            postCreationArea.style.display = 'none';
+            commentsSection.style.display = 'none';
+        }
+    });
+    
+    document.querySelector('.like-btn').addEventListener('click', () => {
+        likeCount++;
+        document.getElementById('likeCount').textContent = formatCount(likeCount);
+        showNotification('Liked!', 'info');
+    });
+    
+    document.querySelector('.share-btn').addEventListener('click', () => {
+        showNotification('Share link copied to clipboard!', 'info');
+    });
+    
+    commentBtn.addEventListener('click', () => {
+        commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+        postCreationArea.style.display = 'none';
+    });
+    
+    postBtn.addEventListener('click', () => {
+        postCreationArea.style.display = postCreationArea.style.display === 'none' ? 'block' : 'none';
+        commentsSection.style.display = 'none';
+    });
+    
+    submitPostBtn.addEventListener('click', () => {
+        const text = postTextarea.value.trim();
+        if (text) {
+            showNotification('Post created successfully!', 'info');
+            postTextarea.value = '';
+            postCreationArea.style.display = 'none';
+        }
+    });
+    
+    cancelPostBtn.addEventListener('click', () => {
+        postTextarea.value = '';
+        postCreationArea.style.display = 'none';
+    });
+    
+    submitCommentBtn.addEventListener('click', () => {
+        const text = commentInput.value.trim();
+        if (text) {
+            addComment(text);
+            commentInput.value = '';
+            commentCount++;
+            document.getElementById('commentCount').textContent = commentCount;
+        }
+    });
+    
+    commentInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitCommentBtn.click();
+        }
+    });
+}
+
+function addComment(text) {
+    const commentItem = document.createElement('div');
+    commentItem.className = 'comment-item';
+    commentItem.innerHTML = `
+        <div class="comment-avatar">👤</div>
+        <div class="comment-content">
+            <div class="comment-author">You</div>
+            <div class="comment-text">${text}</div>
+            <div class="comment-time">Just now</div>
+        </div>
+    `;
+    
+    commentsList.insertBefore(commentItem, commentsList.firstChild);
+    showNotification('Comment added!', 'info');
+}
+
+function formatCount(count) {
+    if (count >= 1000) {
+        return (count / 1000).toFixed(1) + 'k';
+    }
+    return count.toString();
+}
+
 function initializeNavigation() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -240,14 +338,12 @@ function initializeNavigation() {
             if (targetSection) {
                 targetSection.scrollIntoView({ behavior: 'smooth' });
                 
-                // Update active nav link
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
             }
         });
     });
     
-    // Update active nav on scroll
     window.addEventListener('scroll', () => {
         let current = '';
         sections.forEach(section => {
@@ -267,7 +363,6 @@ function initializeNavigation() {
     });
 }
 
-// News Ticker
 function startNewsTicker() {
     tickerText.textContent = newsItems[0];
 }
@@ -277,25 +372,6 @@ function updateNewsTicker() {
     tickerText.textContent = newsItems[currentNewsIndex];
 }
 
-// Simulate listener count updates
-function updateListenerCount() {
-    const baseCount = 1200;
-    const variance = Math.floor(Math.random() * 100);
-    const newCount = baseCount + variance;
-    
-    listenerCount.textContent = newCount.toLocaleString();
-}
-
-// Contact Form
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Show success message
-    alert('Salamat sa iyong mensahe! Makikipag-ugnayan kami sa iyo sa lalong madaling panahon.');
-    contactForm.reset();
-});
-
-// Smooth scroll for all anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -309,7 +385,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Add entrance animations
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -100px 0px'
@@ -324,8 +399,7 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Observe news cards and schedule cards
-document.querySelectorAll('.news-card, .schedule-card, .stat-card').forEach(card => {
+document.querySelectorAll('.news-card, .schedule-card, .stat-card, .station-card, .video-card').forEach(card => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
     card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
