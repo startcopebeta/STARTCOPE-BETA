@@ -1,407 +1,311 @@
-const GEMINI_API_URL = 'https://betadash-api-swordslush-production.up.railway.app/gemini';
+// Radio Player State
+let isPlaying = false;
+let currentVolume = 70;
 
-let currentUser = null;
-let chatHistory = [];
-let settings = {
-    darkMode: false,
-    fontSize: 'medium',
-    responseStyle: 'balanced',
-    autoSave: true,
-    sound: false
-};
+// DOM Elements
+const playBtn = document.getElementById('playBtn');
+const volumeSlider = document.getElementById('volumeSlider');
+const playIcon = document.querySelector('.play-icon');
+const pauseIcon = document.querySelector('.pause-icon');
+const listenerCount = document.getElementById('listenerCount');
+const tickerText = document.getElementById('tickerText');
+const contactForm = document.getElementById('contactForm');
+const radioStream = document.getElementById('radioStream');
 
-window.addEventListener('DOMContentLoaded', () => {
-    initApp();
+// Navigation
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('section');
+
+// Programs Schedule
+const programs = [
+    {
+        time: '6:00-9:00',
+        name: 'Brigada Umaga',
+        host: 'DJ Mike Santos',
+        timeRange: [6, 9]
+    },
+    {
+        time: '9:00-12:00',
+        name: 'Brigada Balita',
+        host: 'Maria Cruz',
+        timeRange: [9, 12]
+    },
+    {
+        time: '12:00-15:00',
+        name: 'Tanghali Patrol',
+        host: 'Jun Reyes',
+        timeRange: [12, 15]
+    },
+    {
+        time: '15:00-18:00',
+        name: 'Hapon Express',
+        host: 'Sarah Gonzales',
+        timeRange: [15, 18]
+    },
+    {
+        time: '18:00-21:00',
+        name: 'Gabi ng Balita',
+        host: 'Tony Villanueva',
+        timeRange: [18, 21]
+    },
+    {
+        time: '21:00-24:00',
+        name: 'Nightcap News',
+        host: 'DJ Mica',
+        timeRange: [21, 24]
+    }
+];
+
+// Breaking News Ticker
+const newsItems = [
+    'Welcome to Brigada News FM - Your trusted source for news and information',
+    'BREAKING: Mahalagang anunsyo mula sa pamahalaan tungkol sa bagong patakaran',
+    'WEATHER UPDATE: Inaasahang umulan sa Metro Manila ngayong hapon',
+    'TRAFFIC ALERT: Heavy traffic sa EDSA southbound dahil sa aksidente',
+    'LOCAL NEWS: Bagong health facility binuksan sa Quezon City',
+    'SPORTS: Local basketball team nanalo sa championship game'
+];
+
+let currentNewsIndex = 0;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    updateCurrentProgram();
+    initializePlayer();
+    initializeNavigation();
+    startNewsTicker();
+    updateListenerCount();
+    
+    // Update program every minute
+    setInterval(updateCurrentProgram, 60000);
+    
+    // Update listener count every 5 seconds
+    setInterval(updateListenerCount, 5000);
+    
+    // Rotate news ticker every 10 seconds
+    setInterval(updateNewsTicker, 10000);
 });
 
-function initApp() {
-    loadSettings();
-    checkAuth();
-    setupEventListeners();
-}
-
-function checkAuth() {
-    try {
-        const user = localStorage.getItem('starAgent_user');
-        if (user) {
-            currentUser = JSON.parse(user);
-            if (currentUser && currentUser.id && currentUser.provider) {
-                showMainApp();
-                return;
-            }
-        }
-    } catch (error) {
-        console.error('Auth check error:', error);
-        localStorage.removeItem('starAgent_user');
-    }
-    showLoginScreen();
-}
-
-function showLoginScreen() {
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-}
-
-function showMainApp() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'grid';
-    loadUserProfile();
-    loadChatHistory();
-    updateStorageInfo();
-}
-
-function loginWith(provider) {
-    if (!provider || !['google', 'facebook', 'github'].includes(provider)) {
-        alert('Invalid login provider');
-        return;
-    }
-
-    const providerData = {
-        google: {
-            name: 'Demo User (Google)',
-            email: `demo.${Date.now()}@gmail.com`,
-            avatar: 'G',
-            provider: 'google',
-            color: '#4285f4'
-        },
-        facebook: {
-            name: 'Demo User (Facebook)',
-            email: `demo.${Date.now()}@facebook.com`,
-            avatar: 'F',
-            provider: 'facebook',
-            color: '#1877f2'
-        },
-        github: {
-            name: 'Demo User (GitHub)',
-            email: `demo.${Date.now()}@users.github.com`,
-            avatar: 'GH',
-            provider: 'github',
-            color: '#333'
-        }
-    };
-
-    try {
-        currentUser = {
-            ...providerData[provider],
-            id: Date.now(),
-            loginDate: new Date().toISOString()
-        };
-
-        localStorage.setItem('starAgent_user', JSON.stringify(currentUser));
-        showMainApp();
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('Login failed. Please try again.');
-    }
-}
-
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('starAgent_user');
-        localStorage.removeItem('starAgent_history');
-        localStorage.removeItem('starAgent_settings');
-        currentUser = null;
-        chatHistory = [];
-        settings = {
-            darkMode: false,
-            fontSize: 'medium',
-            responseStyle: 'balanced',
-            autoSave: true,
-            sound: false
-        };
-        document.body.classList.remove('dark-mode');
-        showLoginScreen();
-    }
-}
-
-function loadUserProfile() {
-    if (!currentUser) return;
+// Play/Pause Functionality
+function initializePlayer() {
+    playBtn.addEventListener('click', togglePlay);
+    volumeSlider.addEventListener('input', updateVolume);
     
-    document.getElementById('userName').textContent = currentUser.name;
-    document.getElementById('userEmail').textContent = currentUser.email;
-    document.getElementById('userAvatar').textContent = currentUser.avatar;
+    // Set initial volume
+    radioStream.volume = currentVolume / 100;
     
-    const avatars = document.querySelectorAll('.user-avatar');
-    avatars.forEach(avatar => {
-        avatar.textContent = currentUser.avatar;
+    // Handle audio events
+    radioStream.addEventListener('play', () => {
+        console.log('Audio started playing');
     });
-}
-
-function setupEventListeners() {
-    const navButtons = document.querySelectorAll('.nav-btn');
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const page = btn.dataset.page;
-            switchPage(page);
-        });
+    
+    radioStream.addEventListener('pause', () => {
+        console.log('Audio paused');
     });
-
-    const sendBtn = document.getElementById('sendBtn');
-    const chatInput = document.getElementById('chatInput');
-
-    sendBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
+    
+    radioStream.addEventListener('error', (e) => {
+        console.error('Audio stream error:', e);
+        if (isPlaying) {
+            handleStreamError('Stream connection lost. Please try reconnecting.');
         }
     });
-
-    chatInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-    });
-
-    document.getElementById('darkModeToggle').addEventListener('change', (e) => {
-        settings.darkMode = e.target.checked;
-        applySettings();
-        saveSettings();
-    });
-
-    document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
-        settings.fontSize = e.target.value;
-        applySettings();
-        saveSettings();
-    });
-
-    document.getElementById('responseStyleSelect').addEventListener('change', (e) => {
-        settings.responseStyle = e.target.value;
-        saveSettings();
-    });
-
-    document.getElementById('autoSaveToggle').addEventListener('change', (e) => {
-        settings.autoSave = e.target.checked;
-        saveSettings();
-    });
-
-    document.getElementById('soundToggle').addEventListener('change', (e) => {
-        settings.sound = e.target.checked;
-        saveSettings();
-    });
 }
 
-function switchPage(page) {
-    const pages = document.querySelectorAll('.page');
-    const navButtons = document.querySelectorAll('.nav-btn');
-
-    pages.forEach(p => p.classList.remove('active'));
-    navButtons.forEach(btn => btn.classList.remove('active'));
-
-    document.getElementById(page + 'Page').classList.add('active');
-    document.querySelector(`[data-page="${page}"]`).classList.add('active');
-
-    if (page === 'history') {
-        loadHistoryPage();
-    } else if (page === 'settings') {
-        updateStorageInfo();
-    }
-}
-
-async function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-
-    if (!message) return;
-
-    const chatContainer = document.getElementById('chatContainer');
-    const welcomeMessage = chatContainer.querySelector('.welcome-message');
-    if (welcomeMessage) {
-        welcomeMessage.remove();
-    }
-
-    addMessage('user', message);
-    input.value = '';
-    input.style.height = 'auto';
-
-    const typingIndicator = addTypingIndicator();
-
-    try {
-        const response = await fetch(`${GEMINI_API_URL}?ask=${encodeURIComponent(message)}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        typingIndicator.remove();
-
-        const botResponse = data.response || 'Sorry, I could not process that.';
-        addMessage('bot', botResponse);
-
-        if (settings.autoSave) {
-            saveChatToHistory(message, botResponse);
-        }
-
-    } catch (error) {
-        console.error('Chat error:', error);
-        typingIndicator.remove();
-        addMessage('bot', 'I\'m having trouble connecting right now. Please check your internet connection and try again.');
-    }
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function addMessage(type, content) {
-    const chatContainer = document.getElementById('chatContainer');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = type === 'user' ? currentUser.avatar : '🤖';
-
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-content';
-    const escapedContent = escapeHtml(content);
-    contentDiv.innerHTML = escapedContent.replace(/\n/g, '<br>');
-
-    messageDiv.appendChild(avatar);
-    messageDiv.appendChild(contentDiv);
-    chatContainer.appendChild(messageDiv);
-
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-function addTypingIndicator() {
-    const chatContainer = document.getElementById('chatContainer');
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message bot';
-    typingDiv.id = 'typing-indicator';
-
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = '🤖';
-
-    const indicatorDiv = document.createElement('div');
-    indicatorDiv.className = 'message-content';
-    const typingSpan = document.createElement('div');
-    typingSpan.className = 'typing-indicator';
-    typingSpan.innerHTML = '<span></span><span></span><span></span>';
-    indicatorDiv.appendChild(typingSpan);
-
-    typingDiv.appendChild(avatar);
-    typingDiv.appendChild(indicatorDiv);
-    chatContainer.appendChild(typingDiv);
-
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    return typingDiv;
-}
-
-function saveChatToHistory(userMessage, botResponse) {
-    const chatEntry = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        userMessage: userMessage,
-        botResponse: botResponse
-    };
-
-    chatHistory.unshift(chatEntry);
-
-    if (chatHistory.length > 100) {
-        chatHistory = chatHistory.slice(0, 100);
-    }
-
-    localStorage.setItem('starAgent_history', JSON.stringify(chatHistory));
-}
-
-function loadChatHistory() {
-    const saved = localStorage.getItem('starAgent_history');
-    if (saved) {
-        chatHistory = JSON.parse(saved);
-    }
-}
-
-function loadHistoryPage() {
-    const historyList = document.getElementById('historyList');
-    historyList.innerHTML = '';
-
-    if (chatHistory.length === 0) {
-        historyList.innerHTML = `
-            <div class="empty-state">
-                <p>No chat history yet</p>
-                <p>Start a conversation to see your history here</p>
-            </div>
-        `;
-        return;
-    }
-
-    chatHistory.forEach(entry => {
-        const item = document.createElement('div');
-        item.className = 'history-item';
+function togglePlay() {
+    if (!isPlaying) {
+        // Try to start playing
+        isPlaying = true;
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        playBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
         
-        const date = new Date(entry.timestamp);
-        const dateStr = date.toLocaleString();
+        // Play the actual audio stream
+        radioStream.play().catch(err => {
+            console.error('Playback failed:', err);
+            handleStreamError('Unable to connect to the live stream. Please try again.');
+        });
+    } else {
+        // Stop playing
+        isPlaying = false;
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        playBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+        
+        // Pause the actual audio stream
+        radioStream.pause();
+    }
+}
 
-        item.innerHTML = `
-            <div class="history-item-header">
-                <span class="history-item-date">${dateStr}</span>
-            </div>
-            <div class="history-item-preview"><strong>You:</strong> ${entry.userMessage}</div>
-            <div class="history-item-preview"><strong>AI:</strong> ${entry.botResponse}</div>
-        `;
+function handleStreamError(message) {
+    // Reset UI to stopped state
+    isPlaying = false;
+    playIcon.style.display = 'block';
+    pauseIcon.style.display = 'none';
+    playBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+    
+    // Show error to user
+    showNotification(message, 'error');
+}
 
-        historyList.appendChild(item);
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: ${type === 'error' ? '#e74c3c' : '#27ae60'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        max-width: 350px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 4 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+function updateVolume(e) {
+    currentVolume = e.target.value;
+    radioStream.volume = currentVolume / 100;
+    console.log('Volume:', currentVolume + '%');
+}
+
+// Update Current Program based on time
+function updateCurrentProgram() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    const currentProgram = programs.find(program => {
+        return currentHour >= program.timeRange[0] && currentHour < program.timeRange[1];
+    });
+    
+    if (currentProgram) {
+        document.getElementById('currentProgram').textContent = currentProgram.name;
+        document.getElementById('currentHost').textContent = currentProgram.host;
+        
+        // Update active schedule card
+        const scheduleCards = document.querySelectorAll('.schedule-card');
+        scheduleCards.forEach((card, index) => {
+            card.classList.remove('active');
+            if (programs[index] === currentProgram) {
+                card.classList.add('active');
+            }
+        });
+    }
+}
+
+// Navigation
+function initializeNavigation() {
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetSection = document.getElementById(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Update active nav link
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+        });
+    });
+    
+    // Update active nav on scroll
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (scrollY >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active');
+            }
+        });
     });
 }
 
-function clearHistory() {
-    if (confirm('Are you sure you want to clear all chat history?')) {
-        chatHistory = [];
-        localStorage.removeItem('starAgent_history');
-        loadHistoryPage();
-    }
+// News Ticker
+function startNewsTicker() {
+    tickerText.textContent = newsItems[0];
 }
 
-function loadSettings() {
-    const saved = localStorage.getItem('starAgent_settings');
-    if (saved) {
-        settings = { ...settings, ...JSON.parse(saved) };
-    }
-    applySettings();
+function updateNewsTicker() {
+    currentNewsIndex = (currentNewsIndex + 1) % newsItems.length;
+    tickerText.textContent = newsItems[currentNewsIndex];
 }
 
-function saveSettings() {
-    localStorage.setItem('starAgent_settings', JSON.stringify(settings));
+// Simulate listener count updates
+function updateListenerCount() {
+    const baseCount = 1200;
+    const variance = Math.floor(Math.random() * 100);
+    const newCount = baseCount + variance;
+    
+    listenerCount.textContent = newCount.toLocaleString();
 }
 
-function applySettings() {
-    document.getElementById('darkModeToggle').checked = settings.darkMode;
-    document.getElementById('fontSizeSelect').value = settings.fontSize;
-    document.getElementById('responseStyleSelect').value = settings.responseStyle;
-    document.getElementById('autoSaveToggle').checked = settings.autoSave;
-    document.getElementById('soundToggle').checked = settings.sound;
+// Contact Form
+contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Show success message
+    alert('Salamat sa iyong mensahe! Makikipag-ugnayan kami sa iyo sa lalong madaling panahon.');
+    contactForm.reset();
+});
 
-    if (settings.darkMode) {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
-    }
-
-    document.body.style.fontSize = settings.fontSize === 'small' ? '14px' :
-                                    settings.fontSize === 'large' ? '18px' : '16px';
-}
-
-function updateStorageInfo() {
-    const totalSize = JSON.stringify(localStorage).length;
-    const sizeKB = (totalSize / 1024).toFixed(2);
-    document.getElementById('storageInfo').textContent = `${sizeKB} KB used`;
-}
-
-function clearAllData() {
-    if (confirm('This will delete all your data including chat history and settings. Are you sure?')) {
-        if (confirm('This action cannot be undone. Continue?')) {
-            localStorage.clear();
-            location.reload();
+// Smooth scroll for all anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
-    }
-}
+    });
+});
+
+// Add entrance animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Observe news cards and schedule cards
+document.querySelectorAll('.news-card, .schedule-card, .stat-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(card);
+});
+
+console.log('Brigada News FM initialized successfully!');
