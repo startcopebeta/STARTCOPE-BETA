@@ -12,15 +12,20 @@ const API_KEY = '4f6239536da10f6d18a40b84c81b0a85';
 // Serve static files from the public directory
 app.use(express.static('public'));
 
-// API endpoint to fetch data from DeOracle
-app.get('/api/deoracle', async (req, res) => {
+// Middleware to parse JSON
+app.use(express.json());
+
+// API endpoint to fetch services
+app.get('/api/services', async (req, res) => {
     try {
         const fetch = (await import('node-fetch')).default;
-        const response = await fetch(DEORACLE_API_URL, {
-            headers: {
-                'Authorization': `Bearer ${API_KEY}`,
-                'Content-Type': 'application/json'
-            }
+        const params = new URLSearchParams({
+            key: API_KEY,
+            action: 'services'
+        });
+        
+        const response = await fetch(`${DEORACLE_API_URL}?${params}`, {
+            method: 'POST'
         });
         
         if (!response.ok) {
@@ -30,8 +35,63 @@ app.get('/api/deoracle', async (req, res) => {
         const data = await response.json();
         res.json(data);
     } catch (error) {
-        console.error('Error fetching from DeOracle:', error);
-        res.status(500).json({ error: 'Failed to fetch data from DeOracle API' });
+        console.error('Error fetching services:', error);
+        res.status(500).json({ error: 'Failed to fetch services from DeOracle API' });
+    }
+});
+
+// API endpoint to get balance
+app.get('/api/balance', async (req, res) => {
+    try {
+        const fetch = (await import('node-fetch')).default;
+        const params = new URLSearchParams({
+            key: API_KEY,
+            action: 'balance'
+        });
+        
+        const response = await fetch(`${DEORACLE_API_URL}?${params}`, {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`DeOracle API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching balance:', error);
+        res.status(500).json({ error: 'Failed to fetch balance' });
+    }
+});
+
+// API endpoint to place an order
+app.post('/api/order', async (req, res) => {
+    try {
+        const fetch = (await import('node-fetch')).default;
+        const { service, link, quantity } = req.body;
+        
+        const params = new URLSearchParams({
+            key: API_KEY,
+            action: 'add',
+            service: service,
+            link: link,
+            quantity: quantity
+        });
+        
+        const response = await fetch(`${DEORACLE_API_URL}?${params}`, {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`DeOracle API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error placing order:', error);
+        res.status(500).json({ error: 'Failed to place order' });
     }
 });
 
